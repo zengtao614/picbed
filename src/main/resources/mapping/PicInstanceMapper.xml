@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo3.test.dao.PicInstanceMapper" >
+  <resultMap id="BaseResultMap" type="com.example.demo3.test.dao.PicInstance" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="PIC_NAME" property="picName" jdbcType="VARCHAR" />
+    <result column="PIC_URL" property="picUrl" jdbcType="VARCHAR" />
+    <result column="PIC_TYPECODE" property="picTypecode" jdbcType="INTEGER" />
+    <result column="PIC_SOURCE" property="picSource" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from PICINSTANCE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getAllPic" resultMap="BaseResultMap" parameterType="java.util.HashMap" >
+    select
+    <include refid="Base_Column_List" />
+    from PICINSTANCE
+    where 1=1
+    <if test='type != null'>
+      and PIC_TYPECODE=#{type}
+    </if>
+    <if test='source != null'>
+      and PIC_SOURCE=#{source}
+    </if>
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from PICINSTANCE
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.example.demo3.test.dao.PicInstance" >
+    insert into PICINSTANCE (ID, PIC_NAME, PIC_URL, 
+      PIC_TYPECODE, PIC_SOURCE)
+    values (#{id,jdbcType=VARCHAR}, #{picName,jdbcType=VARCHAR}, #{picUrl,jdbcType=VARCHAR}, 
+      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.demo3.test.dao.PicInstance" >
+    insert into PICINSTANCE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="picName != null" >
+        PIC_NAME,
+      </if>
+      <if test="picUrl != null" >
+        PIC_URL,
+      </if>
+      <if test="picTypecode != null" >
+        PIC_TYPECODE,
+      </if>
+      <if test="picSource != null" >
+        PIC_SOURCE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="picName != null" >
+        #{picName,jdbcType=VARCHAR},
+      </if>
+      <if test="picUrl != null" >
+        #{picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="picTypecode != null" >
+        #{picTypecode,jdbcType=INTEGER},
+      </if>
+      <if test="picSource != null" >
+        #{picSource,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.demo3.test.dao.PicInstance" >
+    update PICINSTANCE
+    <set >
+      <if test="picName != null" >
+        PIC_NAME = #{picName,jdbcType=VARCHAR},
+      </if>
+      <if test="picUrl != null" >
+        PIC_URL = #{picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="picTypecode != null" >
+        PIC_TYPECODE = #{picTypecode,jdbcType=INTEGER},
+      </if>
+      <if test="picSource != null" >
+        PIC_SOURCE = #{picSource,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.demo3.test.dao.PicInstance" >
+    update PICINSTANCE
+    set PIC_NAME = #{picName,jdbcType=VARCHAR},
+      PIC_URL = #{picUrl,jdbcType=VARCHAR},
+      PIC_TYPECODE = #{picTypecode,jdbcType=INTEGER},
+      PIC_SOURCE = #{picSource,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

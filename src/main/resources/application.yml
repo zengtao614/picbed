@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: test
+    password: 123456
+    url: jdbc:mysql://8.129.15.139:3306/cloud?characterEncoding=utf-8
+  thymeleaf:
+    prefix: classpath:/templates/
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+    #resources:
+    #static-locations: file:D://HbCrawler//
+mybatis:
+  type-aliases-package: com.example.demo3.test.dao
+  mapper-locations: classpath:mapping/*.xml
+
+# 分页插件配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+#爬虫基础参数
+crawler:
+  foldername: /usr/local/image/
+  #  foldername: D:/HbCrawler/    #设置图片保存路径(D:/HbCrawler/)
+  nginxsite: http://8.129.15.139:8089/
+#  nginxsite: http://localhost/  #设置静态服务器地址(http://localhost/)
+server:
+  servlet:
+    context-path: /picbed
