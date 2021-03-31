@@ -1,10 +1,7 @@
 package com.example.demo3.test.crawler;
 
 import com.example.demo3.test.dao.PicInstance;
-import com.example.demo3.test.dao.PicInstanceMapper;
 import com.example.demo3.test.service.IPicInstanceService;
-import com.example.demo3.test.service.imp.PicInstanceService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -140,16 +137,16 @@ public class Crawler extends Thread {
      * @return
      */
     public String getNextUrl(StringBuffer html) {
-        String last_id = null;
+        String lastIdStr = null;
         try {
             Matcher matcher = Pattern.compile(get_dataId_regex).matcher(html);
             while (matcher.find()) {
-                last_id = matcher.group();
+                lastIdStr = matcher.group();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String lastId = last_id.substring(last_id.indexOf("'") + 1, last_id.lastIndexOf("'"));
+        String lastId = lastIdStr.substring(lastIdStr.indexOf("'") + 1, lastIdStr.lastIndexOf("'"));
         String nextUrl = url + "/?max=" + lastId;
         return nextUrl;
     }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PicInstanceService implements IPicInstanceService {
+public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Autowired
     private PicInstanceMapper picInstanceMapper;

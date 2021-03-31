@@ -21,6 +21,7 @@ public class Hbcrawler {
     private static String urlRegex = "\"url\":\".*?\"";
     private static String boardsRegex = "app.page\\[\"boards\"\\] = \\[.*\\]";
     private static String boardidRegex = "\"board_id\":.*?,";
+    private static final Pattern BOARDID_PATTERN = Pattern.compile("[\\d]+");
 
     public static String folder_name;//存储路径
 
@@ -39,8 +40,8 @@ public class Hbcrawler {
         folder_name = foldername;
     }
     @Value("${crawler.nginxsite}")
-    private void setNginxsite(String nginx_site){
-        nginxsite = nginx_site;
+    private void setNginxsite(String nginxSite){
+        nginxsite = nginxSite;
     }
 
     public Hbcrawler(String url) {
@@ -76,7 +77,7 @@ public class Hbcrawler {
             while (matcherUrl.find()) {
                 String urlStr = matcherUrl.group();
                 if (urlStr.contains("board_id")) {
-                    Matcher matcherId = Pattern.compile("[\\d]+").matcher(urlStr);
+                    Matcher matcherId = BOARDID_PATTERN.matcher(urlStr);
                     String id = "";
                     while (matcherId.find()) {
                         id = matcherId.group();
