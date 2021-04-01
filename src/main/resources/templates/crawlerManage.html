@@ -5,6 +5,7 @@
     <title>Title</title>
 </head>
 <body>
+<!--抓取花瓣网图片，通过标签名抓取标签下所有画板-->
     <form action="./starthbcrawler" method="get">
         <input type="text" id="spanname" name="spanname" placeholder="请输入标签名">
         <select name="typecode">
@@ -15,7 +16,7 @@
         </select>
         <input type="submit" value="开始爬虫">
     </form>
-
+<!--抓取花瓣网图片，通过画板id抓取单个画板所有图片-->
     <form action="./starthbcrawlerbyid" method="get">
         <input type="text" name="boardid" placeholder="请输入画板id">
         <select name="typecode">
@@ -26,6 +27,18 @@
         </select>
         <input type="submit" value="开始爬虫">
     </form>
+
+<!--抓取微博用户配图，通过用户containerid来标识唯一用户-->
+<form action="./startwbcrawlerbyid" method="get">
+    <input type="text" name="containerid" placeholder="请输入微博用户标识id">
+    <select name="typecode">
+        <option th:each="type:${allType}" th:value="${type.typeCode}" th:text="${type.typeName}"></option>
+    </select>
+    <select name="sourcecode">
+        <option th:each="source:${allSource}" th:value="${source.sourceCode}" th:text="${source.sourceName}"></option>
+    </select>
+    <input type="submit" value="开始爬虫">
+</form>
 
 </body>
 </html>

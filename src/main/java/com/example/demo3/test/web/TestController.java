@@ -1,19 +1,18 @@
 package com.example.demo3.test.web;
 
 
-import com.example.demo3.test.crawler.Crawler;
-import com.example.demo3.test.crawler.Hbcrawler;
+
 import com.example.demo3.test.dao.PicInstance;
 import com.example.demo3.test.dao.PicSource;
 import com.example.demo3.test.dao.PicType;
 import com.example.demo3.test.service.IPicInstanceService;
 import com.example.demo3.test.service.IPicSourceService;
 import com.example.demo3.test.service.IPicTypeService;
+import com.example.demo3.test.util.SpiderUtil;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class TestController {
         model.addAttribute("allPic",allPic);
         model.addAttribute("allType",allType);
         model.addAttribute("allSource",allSource);
-        model.addAttribute("nginxsite",Hbcrawler.nginxsite);
+        model.addAttribute("nginxsite", SpiderUtil.nginxsite);
         return "index.html";
     }
 
@@ -51,7 +50,6 @@ public class TestController {
     public String getpictype(Model model){
         PicType picType = picTypeService.getPicTypeById("1");
         model.addAttribute("picType",picType);
-        model.addAttribute("mes","撒法");
         return "index.html";
     }
 
@@ -72,22 +70,19 @@ public class TestController {
     @RequestMapping("/starthbcrawler")
     @ResponseBody
     public void startHbCrawler(@RequestParam(name = "spanname") String spanname,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        Hbcrawler hbcrawler = new Hbcrawler(spanname,typecode,sourcecode,picInstanceService);
-        try {
-            hbcrawler.startCrawle();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        picInstanceService.grabHbByspan(spanname,typecode,sourcecode);
     }
 
     @RequestMapping("/starthbcrawlerbyid")
     @ResponseBody
     public void starthbcrawlerbyid(@RequestParam(name = "boardid") String boardid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        try {
-            new Crawler(boardid,typecode,sourcecode,picInstanceService).start();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        picInstanceService.grabHbByid(boardid,typecode,sourcecode);
+    }
+
+    @RequestMapping("/startwbcrawlerbyid")
+    @ResponseBody
+    public void startwbcrawlerbyid(@RequestParam(name = "containerid") String containerid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
+        picInstanceService.grabWbByid(containerid,typecode,sourcecode);
     }
 
 }

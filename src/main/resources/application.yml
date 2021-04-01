@@ -24,10 +24,13 @@ pagehelper:
 
 #爬虫基础参数
 crawler:
-  foldername: /usr/local/image/
-  #  foldername: D:/HbCrawler/    #设置图片保存路径(D:/HbCrawler/)
-  nginxsite: http://8.129.15.139:8089/
-#  nginxsite: http://localhost/  #设置静态服务器地址(http://localhost/)
+#  foldername: /usr/local/image/
+  foldername: D:/HbCrawler/    #设置图片保存路径(D:/HbCrawler/)
+#  nginxsite: http://8.129.15.139:8089/
+  nginxsite: http://localhost/  #设置静态服务器地址(http://localhost/)
 server:
   servlet:
     context-path: /picbed
+    encoding:
+      force: true
+      charset: utf-8

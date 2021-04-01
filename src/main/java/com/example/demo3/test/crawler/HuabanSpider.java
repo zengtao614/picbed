@@ -2,11 +2,9 @@ package com.example.demo3.test.crawler;
 
 import com.example.demo3.test.dao.PicInstance;
 import com.example.demo3.test.service.IPicInstanceService;
+import com.example.demo3.test.util.SpiderUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -15,53 +13,45 @@ import java.util.regex.Pattern;
 /**
  * @Version 1.0
  * @Author:zengtao
- * @Date:
+ * @Date:2021-4-1
  * @Content:
  */
-public class Crawler extends Thread {
+public class HuabanSpider extends Spider {
 
-    private String url;
-    private String folderName;
-    private String boardid;
-    private String typecode;
-    private String sourcecode;
-    private IPicInstanceService picInstanceService;
-
-
+    public static String suggestsRegex = "app.page\\[\"suggests\"\\] = \\{.*\\}";
+    public static String urlRegex = "\"url\":\".*?\"";
+    public static String boardsRegex = "app.page\\[\"boards\"\\] = \\[.*\\]";
+    public static String boardidRegex = "\"board_id\":.*?,";
+    public static final Pattern BOARDID_PATTERN = Pattern.compile("[\\d]+");
 
     private static String get_img_regex = "<img src=\"//hbimg.*?/>";
     private static String get_src_regex = "\"//hbimg.huabanimg.com/.*?\"";
     private static String get_dataId_regex = "pin_id:'[\\d]+'";
+    public static final String HUABAN_BOARDSITE = "https://huaban.com/boards/";
+    public static final String HUABAN_SPANSITE = "https://huaban.com/boards/favorite/";
 
-    public Crawler(String url, String folderName,String boardid,String typecode,String sourcecode,IPicInstanceService picInstanceService) {
-        this.url = url;
-        this.folderName = folderName;
+    private String boardid;
+
+    public HuabanSpider(String boardid, String typecode, String sourcecode, IPicInstanceService picInstanceService){
         this.boardid = boardid;
         this.typecode = typecode;
         this.sourcecode = sourcecode;
         this.picInstanceService = picInstanceService;
+        this.url = HUABAN_BOARDSITE + boardid;
     }
 
-    public Crawler(String boardid,String typecode,String sourcecode,IPicInstanceService picInstanceService) {
-        this.url = "https://huaban.com/boards/" + boardid;
-        this.folderName = Hbcrawler.folder_name + boardid + "\\";
-        this.boardid = boardid;
-        this.typecode = typecode;
-        this.sourcecode = sourcecode;
-        this.picInstanceService = picInstanceService;
-    }
 
     @Override
     public void run() {
         try {
-            File file = new File(folderName);
+            File file = new File(SpiderUtil.folder_name + boardid + "\\");
             if (file.exists()) {
-                Hbcrawler.delete(file);
+                SpiderUtil.delete(file);
             }
             file.mkdirs();
             String thisUrl = url;
             while (true) {
-                StringBuffer html = Hbcrawler.getHtml(thisUrl);
+                StringBuffer html = SpiderUtil.getHtml(thisUrl);
                 LinkedHashSet<String> srcSet = getSrc(html);
                 if (srcSet.size() == 0) {
                     System.out.println(url + "页面已爬取完成");
@@ -89,7 +79,7 @@ public class Crawler extends Thread {
             while (matcherSrc.find()) {
                 String srcStr = matcherSrc.group();
                 if (srcStr.contains("fw236")) {
-                    String srcUrl = "http:"+srcStr.substring(1, srcStr.length() - 1).replace("fw236", "fw658");
+                    String srcUrl = "http:" + srcStr.substring(1, srcStr.length() - 1).replace("fw236", "fw658");
                     srcSet.add(srcUrl);
                 }
             }
@@ -104,35 +94,24 @@ public class Crawler extends Thread {
      */
     public void saveImg(LinkedHashSet<String> srcSet) {
         for (String src : srcSet) {
+            String picname = src.substring(src.lastIndexOf("/") + 1) + ".jpg";
             try {
-
-                if (picInstanceService!=null){
+                if (picInstanceService != null) {
                     //数据库存储操作
                     PicInstance picInstance = new PicInstance();
                     picInstance.setId(UUID.randomUUID().toString());
-                    picInstance.setPicName(src.substring(src.lastIndexOf("/") + 1) + ".jpg");
+                    picInstance.setPicName(picname);
                     picInstance.setPicSource(Integer.valueOf(sourcecode));
                     picInstance.setPicTypecode(Integer.valueOf(typecode));
-                    //下载到本地(Hbcrawler.nginxsite)
-                    picInstance.setPicUrl(boardid+"/"+picInstance.getPicName());
-//                    picInstance.setPicUrl(src);//只存取资源路径
+                    picInstance.setPicUrl(boardid + "/" + picInstance.getPicName());
                     picInstanceService.insert(picInstance);
+                    //下载图片到本地
+                    SpiderUtil.downloadpic(src,SpiderUtil.folder_name + boardid + "\\",picname);
+                    System.out.println(picname + "保存成功");
                 }
-                //文件下载操作
-                URL url = new URL(src);
-                InputStream is = url.openStream();
-                FileOutputStream fos = new FileOutputStream(folderName + src.substring(src.lastIndexOf("/") + 1) + ".jpg");
-                byte[] buf = new byte[1024];
-                int length = 0;
-                while ((length = is.read(buf)) != -1) {
-                    fos.write(buf, 0, length);
-                }
-                fos.close();
-                is.close();
-                System.out.println(src.substring(src.lastIndexOf("/") + 1) + ".jpg" + "下载成功");
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println(src.substring(src.lastIndexOf("/") + 1) + ".jpg" + "下载失败");
+                System.out.println(picname + "保存失败");
             }
         }
     }

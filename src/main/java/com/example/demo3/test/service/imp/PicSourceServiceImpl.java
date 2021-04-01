@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * @author zt
+ */
 @Service
 public class PicSourceServiceImpl implements IPicSourceService {
 
