@@ -22,11 +22,15 @@ public class Hbcrawler {
     private static String boardsRegex = "app.page\\[\"boards\"\\] = \\[.*\\]";
     private static String boardidRegex = "\"board_id\":.*?,";
     private static final Pattern BOARDID_PATTERN = Pattern.compile("[\\d]+");
-
-    public static String folder_name;//存储路径
-
-    public static String nginxsite;//静态服务器端口
-    private String url;//
+    /**
+     * 存储路径
+     */
+    public static String folder_name;
+    /**
+     * 静态服务器地址
+     */
+    public static String nginxsite;
+    private String url;
     private String typecode;
     private String sourcecode;
     private IPicInstanceService picInstanceService;

@@ -12,6 +12,12 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @Version 1.0
+ * @Author:zengtao
+ * @Date:
+ * @Content:
+ */
 public class Crawler extends Thread {
 
     private String url;
@@ -107,7 +113,8 @@ public class Crawler extends Thread {
                     picInstance.setPicName(src.substring(src.lastIndexOf("/") + 1) + ".jpg");
                     picInstance.setPicSource(Integer.valueOf(sourcecode));
                     picInstance.setPicTypecode(Integer.valueOf(typecode));
-                    picInstance.setPicUrl(boardid+"/"+picInstance.getPicName());//下载到本地(Hbcrawler.nginxsite)
+                    //下载到本地(Hbcrawler.nginxsite)
+                    picInstance.setPicUrl(boardid+"/"+picInstance.getPicName());
 //                    picInstance.setPicUrl(src);//只存取资源路径
                     picInstanceService.insert(picInstance);
                 }
@@ -115,7 +122,7 @@ public class Crawler extends Thread {
                 URL url = new URL(src);
                 InputStream is = url.openStream();
                 FileOutputStream fos = new FileOutputStream(folderName + src.substring(src.lastIndexOf("/") + 1) + ".jpg");
-                byte buf[] = new byte[1024];
+                byte[] buf = new byte[1024];
                 int length = 0;
                 while ((length = is.read(buf)) != -1) {
                     fos.write(buf, 0, length);
