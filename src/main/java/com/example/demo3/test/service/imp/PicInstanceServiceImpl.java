@@ -71,4 +71,9 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     public void grabWbByid(String containerid, String typecode, String sourcecode) {
         new WeiboSpider(containerid,typecode,sourcecode,this).start();
     }
+
+    @Override
+    public List<PicInstance> getRandomPic() {
+        return picInstanceMapper.getRandomPic();
+    }
 }

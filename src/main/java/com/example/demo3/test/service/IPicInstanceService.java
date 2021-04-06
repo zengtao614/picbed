@@ -3,6 +3,7 @@ package com.example.demo3.test.service;
 import com.example.demo3.test.dao.PicInstance;
 import com.github.pagehelper.PageInfo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,4 +49,10 @@ public interface IPicInstanceService {
      * @param sourcecode 图片来源代码
      */
     void grabWbByid(String containerid, String typecode, String sourcecode);
+
+    /**
+     * 随机查询20条数据
+     * @return 返回实例列表
+     */
+    List<PicInstance> getRandomPic();
 }

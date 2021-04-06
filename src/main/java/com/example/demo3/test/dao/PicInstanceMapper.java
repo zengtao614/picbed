@@ -25,6 +25,5 @@ public interface PicInstanceMapper {
 
     List<PicInstance> getAllPic(Map params);
 
-    @Select("select * from PICINSTANCE")
-    List<PicInstance> getAllPicBypage();
+    List<PicInstance> getRandomPic();
 }

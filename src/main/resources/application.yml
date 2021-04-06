@@ -4,6 +4,8 @@ spring:
     username: test
     password: 123456
     url: jdbc:mysql://8.129.15.139:3306/cloud?characterEncoding=utf-8
+    dbcp2:
+      validation-query: SELECT 1
   thymeleaf:
     prefix: classpath:/templates/
 #  热部署

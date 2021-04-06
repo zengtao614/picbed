@@ -59,6 +59,15 @@ public class TestController {
         return "index.html";
     }
 
+    @RequestMapping("/randompic")
+    public String randompic(Model model){
+
+        List<PicInstance> allPic = picInstanceService.getRandomPic();
+        model.addAttribute("allPic",allPic);
+        model.addAttribute("nginxsite", SpiderUtil.nginxsite);
+        return "randompic.html";
+    }
+
     @RequestMapping("/getpictype")
     public String getpictype(Model model){
         PicType picType = picTypeService.getPicTypeById("1");
