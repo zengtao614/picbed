@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,9 +25,9 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     @Autowired
     private PicInstanceMapper picInstanceMapper;
     @Override
-    public PageInfo<PicInstance> getAllPic(int pagenum, int pagesize) {
+    public PageInfo<PicInstance> getAllPic(int pagenum, int pagesize, Map params) {
         PageHelper.startPage(pagenum,pagesize);
-        List<PicInstance> picInstanceList = picInstanceMapper.getAllPic();
+        List<PicInstance> picInstanceList = picInstanceMapper.getAllPic(params);
         PageInfo<PicInstance> pageInfo = new PageInfo<>(picInstanceList);
         return pageInfo;
     }

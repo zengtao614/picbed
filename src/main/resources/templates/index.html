@@ -29,6 +29,9 @@
         .page .nav .pictype .typeitem,.page .nav .picsource .sourceitem{
             padding: 5px;
         }
+        .page .nav .pictype .typeitem.selected,.page .nav .picsource .sourceitem.selected{
+            color:red;
+        }
         .page .content{
             margin-top: 20px;
             padding: 10px;
@@ -56,11 +59,13 @@
     <div class="nav">
         <!-- 图片类型 -->
         <div class="pictype">
-            图片类型：<div th:each="type:${allType}" th:text="${type.typeName}" class="typeitem">default message</div>
+            图片类型：<div  class="typeitem" value="0" onclick="settype()">全部</div>
+            <div th:each="type:${allType}" th:text="${type.typeName}" class="typeitem" th:value="${type.typeCode}" onclick="settype()">default message</div>
         </div>
         <!-- 图片来源 -->
         <div class="picsource">
-            图片类型：<div th:each="source:${allSource}" th:text="${source.sourceName}" class="sourceitem">default message</div>
+            图片来源：<div  class="sourceitem" value="0" onclick="setsource()">全部</div>
+            <div th:each="source:${allSource}" th:text="${source.sourceName}" class="sourceitem" th:value="${source.sourceCode}" onclick="setsource()">default message</div>
         </div>
     </div>
     <!-- 图片展示内容 -->
@@ -72,21 +77,67 @@
     </div>
     <div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:99;width:100%;height:100%;display:none;">
         <div id="innerdiv" style="position:absolute;">
-            <img id="bigimg" style="border:5px solid #fff;" src="" />
+            <img id="bigimg" style="border:5px solid #ffffff;" src="" />
         </div>
     </div>
     <div id="example" style="text-align: center"> <ul id="pagination" class=""></ul> </div>
     <div id="pagelimit">
     </div>
-    <input type="hidden" id="pageNum" name="pageNum" th:value="${allPic.pageNum}" />
-    <input type="hidden" id="pages" name="pages" th:value="${allPic.pages}" />
-    <input type="hidden" id="pageSize" name="pageSize" th:value="${allPic.pageSize}" />
+        <input type="hidden" id="typeCode" name="typeCode" th:value="${type}"/>
+        <input type="hidden" id="sourceCode" name="sourceCode" th:value="${source}"/>
+<!--    <input type="hidden" id="pageNum" name="pageNum" th:value="${allPic.pageNum}" />-->
+<!--    <input type="hidden" id="pages" name="pages" th:value="${allPic.pages}" />-->
+<!--    <input type="hidden" id="pageSize" name="pageSize" th:value="${allPic.pageSize}" />-->
     <!-- 底部 -->
     <div class="footer">
         <a href="./startcrawler">启动爬虫</a>
     </div>
 </div>
 </body>
+<script>
+    $(function (){
+        $(".typeitem").each(function (){
+            $(this).removeClass("selected")
+            if($(this).attr("value")==$("#typeCode").attr("value")){
+                $(this).addClass("selected")
+            }
+        })
+        $(".sourceitem").each(function (){
+            $(this).removeClass("selected")
+            if($(this).attr("value")==$("#sourceCode").attr("value")){
+                $(this).addClass("selected")
+            }
+        })
+        //console.log("参数:"+$("#typeCode").attr("value"))
+        //console.log("参数:"+$("#sourceCode").attr("value"))
+    })
+
+</script>
+
+<!--设置查询参数-->
+<script>
+<!--设置类型参数-->
+    function settype(event) {
+        event = event ? event : window.event;
+        var obj = event.srcElement ? event.srcElement : event.target;
+//这时obj就是触发事件的对象，可以使用它的各个属性
+//还可以将obj转换成jquery对象，方便选用其他元素
+        var $obj = $(obj);
+        $("#typeCode").attr("value",$obj.attr("value"))
+        window.location = '?pageNum='+'2'+'&typecode='+$("#typeCode").attr("value")+'&sourcecode='+$("#sourceCode").attr("value");
+    }
+<!--设置来源参数-->
+    function setsource(event) {
+        event = event ? event : window.event;
+        var obj = event.srcElement ? event.srcElement : event.target;
+        var $obj = $(obj);
+        $("#sourceCode").attr("value",$obj.attr("value"));
+        window.location = '?pageNum='+'2'+'&typecode='+$("#typeCode").attr("value")+'&sourcecode='+$("#sourceCode").attr("value");
+    }
+
+</script>
+
+
 <!--分页生成js代码-->
 <script th:inline="javascript">
     $(function(){
@@ -103,7 +154,7 @@
 //current：当前页码
             pageUrl:function(type,page,current)
             {
-                return '?pageNum='+page;
+                return '?pageNum='+page+'&typecode='+$("#typeCode").attr("value")+'&sourcecode='+$("#sourceCode").attr("value");
             },
 
             itemTexts:function(type,page, current)
@@ -133,7 +184,6 @@
             imgShow("#outerdiv", "#innerdiv", "#bigimg", _this);
         });
     });
-
     function imgShow(outerdiv, innerdiv, bigimg, _this){
         var src = _this.attr("src");//获取当前点击的pimg元素中的src属性
         $(bigimg).attr("src", src);//设置#bigimg元素的src属性

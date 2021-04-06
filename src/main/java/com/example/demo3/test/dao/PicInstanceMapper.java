@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface PicInstanceMapper {
@@ -22,7 +23,7 @@ public interface PicInstanceMapper {
 
     int updateByPrimaryKey(PicInstance record);
 
-    List<PicInstance> getAllPic();
+    List<PicInstance> getAllPic(Map params);
 
     @Select("select * from PICINSTANCE")
     List<PicInstance> getAllPicBypage();

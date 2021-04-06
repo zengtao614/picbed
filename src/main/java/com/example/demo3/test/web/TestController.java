@@ -15,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class TestController {
@@ -30,7 +32,7 @@ public class TestController {
 
 
     @RequestMapping("/")
-    public String pictype(Model model, PageInfo pageInfo){
+    public String pictype(Model model, PageInfo pageInfo,@RequestParam(name = "typecode",required=false,defaultValue="0") String typecode,@RequestParam(name = "sourcecode",required=false,defaultValue="0") String sourcecode){
         int pageNum  = (pageInfo.getPageNum() == 0)? 1 : pageInfo.getPageNum();
         int pageSize  = (pageInfo.getPageSize() == 0)? 12 : pageInfo.getPageSize();
         //查询所有图片类型
@@ -38,10 +40,21 @@ public class TestController {
         //查询所有图片来源
         List<PicSource> allSource = picSourceService.getAllSource();
         //分页查询所有图片
-        PageInfo<PicInstance> allPic = picInstanceService.getAllPic(pageNum, pageSize);
+        Map params = new HashMap();
+        if(typecode==null||typecode.equals("")){
+            typecode = "0";
+        }
+        if(sourcecode==null||sourcecode.equals("")){
+            sourcecode = "0";
+        }
+        params.put("type",typecode);
+        params.put("source",sourcecode);
+        PageInfo<PicInstance> allPic = picInstanceService.getAllPic(pageNum, pageSize,params);
         model.addAttribute("allPic",allPic);
         model.addAttribute("allType",allType);
         model.addAttribute("allSource",allSource);
+        model.addAttribute("type",typecode);
+        model.addAttribute("source",sourcecode);
         model.addAttribute("nginxsite", SpiderUtil.nginxsite);
         return "index.html";
     }
