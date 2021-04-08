@@ -12,18 +12,21 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.annotation.Async;
+
+import java.util.concurrent.*;
 
 @SpringBootTest
 class Demo3ApplicationTests {
 
-    @Test
+/*    @Test
     void contextLoads() {
         String picur = "https://wx3.sinaimg.cn/large/e9850d5agy1flkww6brgij215o15ox6p.jpg";
         System.out.println(picur.substring(picur.lastIndexOf("/") + 1));
 
-    }
+    }*/
 
-    @Test
+/*    @Test
     void httpTest(){
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet("https://m.weibo.cn/api/container/getIndex?containerid=1076033917811034");
@@ -62,6 +65,37 @@ class Demo3ApplicationTests {
         }
 
 
+    }*/
+
+/*    @Test
+    void threadTest(){
+        ThreadPoolExecutor poolExecutor =
+                new ThreadPoolExecutor(10,10,1000L,
+                        TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(10),
+                        Executors.defaultThreadFactory(),new ThreadPoolExecutor.CallerRunsPolicy());
+        for (int i=0;i<100;i++){
+            poolExecutor.execute(()->{
+                System.out.println("线程开始");
+                try{
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                System.out.println("线程结束");
+            });
+        }
+    }*/
+
+    @Test
+    @Async("taskExecutor")
+    void threadpoolTest1(){
+        System.out.println(Thread.currentThread().getName()+"-----");
+    }
+
+    @Test
+    @Async("taskExecutor")
+    void threadpoolTest2(){
+        System.out.println(Thread.currentThread().getName()+"-----");
     }
 
 }

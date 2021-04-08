@@ -41,10 +41,10 @@ public class TestController {
         List<PicSource> allSource = picSourceService.getAllSource();
         //分页查询所有图片
         Map params = new HashMap();
-        if(typecode==null||typecode.equals("")){
+        if(typecode==null||"".equals(typecode)){
             typecode = "0";
         }
-        if(sourcecode==null||sourcecode.equals("")){
+        if(sourcecode==null||"".equals(sourcecode)){
             sourcecode = "0";
         }
         params.put("type",typecode);

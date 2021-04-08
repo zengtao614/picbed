@@ -1,7 +1,8 @@
 package com.example.demo3.test.service.imp;
 
-import com.example.demo3.test.crawler.HuabanSpider;
-import com.example.demo3.test.crawler.WeiboSpider;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.example.demo3.test.crawler.PicCrawler;
 import com.example.demo3.test.dao.PicInstance;
 import com.example.demo3.test.dao.PicInstanceMapper;
 import com.example.demo3.test.service.IPicInstanceService;
@@ -11,6 +12,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,6 +26,9 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Autowired
     private PicInstanceMapper picInstanceMapper;
+    @Autowired
+    private PicCrawler picCrawler;
+
     @Override
     public PageInfo<PicInstance> getAllPic(int pagenum, int pagesize, Map params) {
         PageHelper.startPage(pagenum,pagesize);
@@ -39,26 +44,30 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public void grabHbByid(String boardid, String typecode, String sourcecode) {
-        new HuabanSpider(boardid,typecode,sourcecode,this).start();
+        picCrawler.hbspiderRun(boardid,typecode,sourcecode);
     }
 
     @Override
     public void grabHbByspan(String spanname, String typecode, String sourcecode) {
         try {
-            StringBuffer html = SpiderUtil.getHtml(HuabanSpider.HUABAN_SPANSITE+spanname);
-            Matcher matcherSu = Pattern.compile(HuabanSpider.boardsRegex).matcher(html);
+            StringBuffer html = SpiderUtil.getHtml(SpiderUtil.HUABAN_SPANSITE+spanname);
+            Matcher matcherSu = Pattern.compile(SpiderUtil.boardsRegex).matcher(html);
             while (matcherSu.find()) {
-                Matcher matcherUrl = Pattern.compile(HuabanSpider.boardidRegex).matcher(matcherSu.group());
+                LinkedHashSet<String> idSet = new LinkedHashSet<>();
+                Matcher matcherUrl = Pattern.compile(SpiderUtil.boardidRegex).matcher(matcherSu.group());
                 while (matcherUrl.find()) {
                     String urlStr = matcherUrl.group();
+                    String id = "";
                     if (urlStr.contains("board_id")) {
-                        Matcher matcherId = HuabanSpider.BOARDID_PATTERN.matcher(urlStr);
-                        String id = "";
+                        Matcher matcherId = SpiderUtil.BOARDID_PATTERN.matcher(urlStr);
                         while (matcherId.find()) {
                             id = matcherId.group();
+                            idSet.add(id);
                         }
-                        new HuabanSpider(id,typecode,sourcecode,this).start();
                     }
+                }
+                for (String boardid:idSet){
+                    picCrawler.hbspiderRun(boardid,typecode,sourcecode);
                 }
             }
         }catch (Exception e){
@@ -69,7 +78,22 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public void grabWbByid(String containerid, String typecode, String sourcecode) {
-        new WeiboSpider(containerid,typecode,sourcecode,this).start();
+        try {
+            SpiderUtil.createFolder(SpiderUtil.folder_name + containerid + "\\");
+            String url = SpiderUtil.weibo_baseurl + containerid;
+            JSONObject pagejson = JSON.parseObject(SpiderUtil.getResponse(url));
+            if("1".equals(String.valueOf(pagejson.get("ok")))){
+                int total = (Integer)(pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
+                int page = (total/10) + 1;
+                for (int i=0;i<=page;i++){
+                    picCrawler.wbspiderRun(url,containerid,typecode,sourcecode);
+                }
+            }else{
+                System.out.println("此用户下无微博！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
