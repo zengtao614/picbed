@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="js/jquery-1.12.4.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .page{
+            display: flex;
+            flex-direction: column;
+        }
+        .page .title{
+            font-size: 20px;
+            text-align: center;
+            background-color: aqua;
+        }
+        .page .content{
+            margin-top: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        .page .content .piccell{
+            padding: 10px;
+            border-bottom: 1px solid red;
+            display: flex;
+            flex-direction: row;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- 标题 -->
+    <div class="title">爬虫进度</div>
+
+    <!-- 图片展示内容 -->
+    <div class="content">
+        <div  class="piccell" th:each="dayCyc : ${#numbers.sequence(1,taskcount)}" >
+            <span th:text="第+${dayCyc}+页" />
+            <div class="progress progress-striped active" style="flex: 1">
+                <div class="progress-bar progress-bar-success" th:classappend="page+${dayCyc}" role="progressbar"
+                     aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                     style="width: 0%;">
+                    0%
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<!--定时获取下载进度方法-->
+<script>
+    //点击确认导入执行此方法
+    $(function () {
+        var timingTask = setInterval(function(){
+            $.ajax({
+                type: 'post',
+                url: "./getprogress?page="+[[${taskcount}]],
+                dataType : 'json',
+                success: function(result) {
+                    //progress = result.value;
+                    console.log(result)
+                    //var a = $.parseJSON(result);
+
+                    for (var i=1;i<=[[${taskcount}]];i++){
+                        $(".page"+i).width((parseFloat(result[i+"_nownum"])/parseFloat(result[i+"_count"]))*100+"%");
+                        $(".page"+i).text("总数:"+result[i+"_count"]+";当前:"+result[i+"_nownum"]);
+                    }
+                    /*if (progress != "error"){
+                        var date = progress.substring(0,6);
+                        //这里更新进度条的进度和数据
+                        $(".progress-bar").width(parseFloat(date)+"%");
+                        $(".progress-bar").text(parseFloat(date)+"%");
+                    }*/
+                }
+            });
+        }, 1000)
+    })
+</script>
+</html>

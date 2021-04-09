@@ -51,8 +51,18 @@ public interface IPicInstanceService {
     void grabWbByid(String containerid, String typecode, String sourcecode);
 
     /**
+     *
+     * @param containerid
+     * @param typecode
+     * @param sourcecode
+     * @return
+     */
+    int grabWbByidTest(String containerid, String typecode, String sourcecode);
+
+    /**
      * 随机查询20条数据
      * @return 返回实例列表
      */
     List<PicInstance> getRandomPic();
+
 }

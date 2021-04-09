@@ -97,6 +97,29 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     }
 
     @Override
+    public int grabWbByidTest(String containerid, String typecode, String sourcecode) {
+        try {
+            SpiderUtil.createFolder(SpiderUtil.folder_name + containerid + "\\");
+            String url = SpiderUtil.weibo_baseurl + containerid;
+            JSONObject pagejson = JSON.parseObject(SpiderUtil.getResponse(url));
+            if("1".equals(String.valueOf(pagejson.get("ok")))){
+                int total = (Integer)(pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
+                int page = (total/10) + 1;
+                for (int i=1;i<=page;i++){
+                    String pageurl = url + "&page=" + i;
+                    picCrawler.wbspiderRun(pageurl,containerid,typecode,sourcecode,i);
+                }
+                return page;
+            }else{
+                System.out.println("此用户下无微博！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
     public List<PicInstance> getRandomPic() {
         return picInstanceMapper.getRandomPic();
     }

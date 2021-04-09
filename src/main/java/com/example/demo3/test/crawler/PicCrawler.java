@@ -8,6 +8,7 @@ import com.example.demo3.test.service.IPicInstanceService;
 import com.example.demo3.test.util.SpiderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,9 @@ public class PicCrawler {
     @Autowired
     @Lazy
     private IPicInstanceService picInstanceService;
+
+    @Autowired
+    private RedisTemplate<String,  String> redisTemplate;
 
 
     /**
@@ -55,6 +59,40 @@ public class PicCrawler {
                 }
             }
         }
+    }
+
+    /**
+     * 测试方法
+     * @param url
+     * @param containerid
+     * @param typecode
+     * @param sourcecode
+     * @param page
+     */
+    @Async("taskExecutor")
+    public void wbspiderRun(String url, String containerid, String typecode, String sourcecode,int page) {
+        System.out.println("线程启动，当前url:"+url);
+        String content = SpiderUtil.getResponse(url);
+        if (content!=null) {
+            JSONObject jsonObject = JSON.parseObject(content);
+            if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
+                JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
+                redisTemplate.opsForValue().set(page+"_count",String.valueOf(jsonArray.size()));
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
+                    if (picsarray != null) {
+                        for (int n = 0; n < picsarray.size(); n++) {
+                            String picurl = (String) picsarray.getJSONObject(n).getJSONObject("large").get("url");
+                            String picname = picurl.substring(picurl.lastIndexOf("/") + 1);
+                            //saveImg(picname, sourcecode, typecode, containerid, picurl);
+                            saveImgTest(picname, sourcecode, typecode, containerid, picurl);
+                        }
+                    }
+                    redisTemplate.opsForValue().set(page+"_nownum",String.valueOf(i+1));
+                }
+            }
+        }
+        System.out.println("第"+page+"已爬取完毕");
     }
 
     /**
@@ -88,6 +126,14 @@ public class PicCrawler {
         }
     }
 
+    /**
+     * 存储图片到数据库和本地
+     * @param picname
+     * @param sourcecode
+     * @param typecode
+     * @param folderid
+     * @param picurl
+     */
     public void saveImg(String picname, String sourcecode, String typecode, String folderid, String picurl) {
         try {
             if (picInstanceService != null) {
@@ -103,6 +149,33 @@ public class PicCrawler {
                 SpiderUtil.downloadpic(picurl, SpiderUtil.folder_name + folderid + "\\", picname);
                 System.out.println(picname + "保存成功");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(picname + "保存失败");
+        }
+    }
+
+    /**
+     * 模拟存储图片，删去下载操作，节省流量
+     * @param picname
+     * @param sourcecode
+     * @param typecode
+     * @param folderid
+     * @param picurl
+     */
+    public void saveImgTest(String picname, String sourcecode, String typecode, String folderid, String picurl) {
+        try {
+            if (picInstanceService != null) {
+                //数据库存储操作
+                PicInstance picInstance = new PicInstance();
+                picInstance.setId(UUID.randomUUID().toString());
+                picInstance.setPicName(picname);
+                picInstance.setPicSource(Integer.valueOf(sourcecode));
+                picInstance.setPicTypecode(Integer.valueOf(typecode));
+                picInstance.setPicUrl(folderid + "/" + picInstance.getPicName());
+                //picInstanceService.insert(picInstance);
+            }
+            Thread.sleep(500);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(picname + "保存失败");

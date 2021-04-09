@@ -8,7 +8,12 @@ spring:
       validation-query: SELECT 1
   thymeleaf:
     prefix: classpath:/templates/
-#  热部署
+#配置redis
+  redis:
+    host: localhost
+    password: 123456
+    port: 6379
+  #  热部署
   devtools:
     restart:
       enabled: true

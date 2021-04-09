@@ -11,6 +11,7 @@ import com.example.demo3.test.service.IPicTypeService;
 import com.example.demo3.test.util.SpiderUtil;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,8 @@ public class TestController {
     private IPicSourceService picSourceService;
     @Autowired
     private IPicInstanceService picInstanceService;
+    @Autowired
+    private RedisTemplate<String,  String> redisTemplate;
 
 
 
@@ -102,9 +105,24 @@ public class TestController {
     }
 
     @RequestMapping("/startwbcrawlerbyid")
-    @ResponseBody
-    public void startwbcrawlerbyid(@RequestParam(name = "containerid") String containerid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        picInstanceService.grabWbByid(containerid,typecode,sourcecode);
+    public String startwbcrawlerbyid(Model model,@RequestParam(name = "containerid") String containerid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
+        int i = picInstanceService.grabWbByidTest(containerid, typecode, sourcecode);
+        model.addAttribute("taskcount",i);
+        return "crawler_schedule.html";
     }
+
+    @RequestMapping("/getprogress")
+    @ResponseBody
+    public Map getprogress(Model model,@RequestParam(name = "page") String page){
+        Map result = new HashMap();
+        int pagecount = Integer.valueOf(page);
+        for (int n=1;n<=pagecount;n++){
+            result.put(n+"_count",redisTemplate.opsForValue().get(n+"_count"));
+            result.put(n+"_nownum",redisTemplate.opsForValue().get(n+"_nownum"));
+        }
+        return result;
+    }
+
+
 
 }
