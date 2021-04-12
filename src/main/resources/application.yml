@@ -42,3 +42,4 @@ server:
     encoding:
       force: true
       charset: utf-8
+  port: 8090

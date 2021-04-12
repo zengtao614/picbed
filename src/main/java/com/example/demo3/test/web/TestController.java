@@ -29,9 +29,6 @@ public class TestController {
     private IPicSourceService picSourceService;
     @Autowired
     private IPicInstanceService picInstanceService;
-    @Autowired
-    private RedisTemplate<String,  String> redisTemplate;
-
 
 
     @RequestMapping("/")
@@ -76,51 +73,6 @@ public class TestController {
         PicType picType = picTypeService.getPicTypeById("1");
         model.addAttribute("picType",picType);
         return "index.html";
-    }
-
-    @RequestMapping("/startcrawler")
-    public String startcrawler(Model model){
-        //查询所有已配置爬虫
-
-        //查询所有图片类型
-        List<PicType> allType = picTypeService.getAllType();
-        //查询所有图源
-        List<PicSource> allSource = picSourceService.getAllSource();
-        model.addAttribute("allType",allType);
-        model.addAttribute("allSource",allSource);
-        return "crawlerManage.html";
-    }
-
-
-    @RequestMapping("/starthbcrawler")
-    @ResponseBody
-    public void startHbCrawler(@RequestParam(name = "spanname") String spanname,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        picInstanceService.grabHbByspan(spanname,typecode,sourcecode);
-    }
-
-    @RequestMapping("/starthbcrawlerbyid")
-    @ResponseBody
-    public void starthbcrawlerbyid(@RequestParam(name = "boardid") String boardid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        picInstanceService.grabHbByid(boardid,typecode,sourcecode);
-    }
-
-    @RequestMapping("/startwbcrawlerbyid")
-    public String startwbcrawlerbyid(Model model,@RequestParam(name = "containerid") String containerid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
-        int i = picInstanceService.grabWbByidTest(containerid, typecode, sourcecode);
-        model.addAttribute("taskcount",i);
-        return "crawler_schedule.html";
-    }
-
-    @RequestMapping("/getprogress")
-    @ResponseBody
-    public Map getprogress(Model model,@RequestParam(name = "page") String page){
-        Map result = new HashMap();
-        int pagecount = Integer.valueOf(page);
-        for (int n=1;n<=pagecount;n++){
-            result.put(n+"_count",redisTemplate.opsForValue().get(n+"_count"));
-            result.put(n+"_nownum",redisTemplate.opsForValue().get(n+"_nownum"));
-        }
-        return result;
     }
 
 

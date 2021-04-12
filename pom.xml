@@ -51,6 +51,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--Spring Security依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!--sprinboot依赖-->
 
         <!--打包war包必须依赖        -->

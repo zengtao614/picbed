@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo3.test.dao.PicInstance;
 import com.example.demo3.test.service.IPicInstanceService;
+import com.example.demo3.test.util.RedisUtil;
 import com.example.demo3.test.util.SpiderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -29,7 +30,7 @@ public class PicCrawler {
     private IPicInstanceService picInstanceService;
 
     @Autowired
-    private RedisTemplate<String,  String> redisTemplate;
+    private RedisUtil redisUtil;
 
 
     /**
@@ -77,7 +78,7 @@ public class PicCrawler {
             JSONObject jsonObject = JSON.parseObject(content);
             if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
-                redisTemplate.opsForValue().set(page+"_count",String.valueOf(jsonArray.size()));
+                redisUtil.set(page+"_count",String.valueOf(jsonArray.size()));
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
                     if (picsarray != null) {
@@ -88,7 +89,7 @@ public class PicCrawler {
                             saveImgTest(picname, sourcecode, typecode, containerid, picurl);
                         }
                     }
-                    redisTemplate.opsForValue().set(page+"_nownum",String.valueOf(i+1));
+                    redisUtil.set(page+"_nownum",String.valueOf(i+1));
                 }
             }
         }
