@@ -1,10 +1,13 @@
 package com.example.demo3.test.dao;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class User implements UserDetails {
     private Integer id;
@@ -22,6 +25,16 @@ public class User implements UserDetails {
     private String userface;
 
     private Date regtime;
+
+    private List<Roles> roles;
+
+    public List<Roles> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Roles> roles) {
+        this.roles = roles;
+    }
 
     public Integer getId() {
         return id;
@@ -70,7 +83,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
+        for (Roles role:roles){
+            grantedAuthorityList.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return grantedAuthorityList;
     }
     @Override
     public String getPassword() {

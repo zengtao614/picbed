@@ -3,6 +3,8 @@ package com.example.demo3.test.dao;
 import com.example.demo3.test.dao.User;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
@@ -18,4 +20,5 @@ public interface UserMapper {
     int updateByPrimaryKey(User record);
 
     User loadUserByUsername(String s);
+
 }

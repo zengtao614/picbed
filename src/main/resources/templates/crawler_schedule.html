@@ -37,7 +37,7 @@
 
     <!-- 图片展示内容 -->
     <div class="content">
-        <div  class="piccell" th:each="dayCyc : ${#numbers.sequence(1,taskcount)}" >
+        <div th:if="${taskcount}>=1" class="piccell" th:each="dayCyc : ${#numbers.sequence(1,taskcount)}" >
             <span th:text="第+${dayCyc}+页" />
             <div class="progress progress-striped active" style="flex: 1">
                 <div class="progress-bar progress-bar-success" th:classappend="page+${dayCyc}" role="progressbar"
@@ -47,6 +47,8 @@
                 </div>
             </div>
         </div>
+        <div th:if="${taskcount}<1">此用户下无微博</div>
+
     </div>
 </div>
 </div>
@@ -55,29 +57,32 @@
 <script>
     //点击确认导入执行此方法
     $(function () {
-        var timingTask = setInterval(function(){
-            $.ajax({
-                type: 'post',
-                url: "./getprogress?page="+[[${taskcount}]],
-                dataType : 'json',
-                success: function(result) {
-                    //progress = result.value;
-                    console.log(result)
-                    //var a = $.parseJSON(result);
+        if([[${taskcount}]]>=1) {
+            var timingTask = setInterval(function () {
+                $.ajax({
+                    type: 'post',
+                    url: "./getprogress?page=" + [[${taskcount}]],
+                    dataType: 'json',
+                    success: function (result) {
+                        //progress = result.value;
+                        console.log(result)
+                        //var a = $.parseJSON(result);
 
-                    for (var i=1;i<=[[${taskcount}]];i++){
-                        $(".page"+i).width((parseFloat(result[i+"_nownum"])/parseFloat(result[i+"_count"]))*100+"%");
-                        $(".page"+i).text("总数:"+result[i+"_count"]+";当前:"+result[i+"_nownum"]);
-                    }
-                    /*if (progress != "error"){
+                        for (var i = 1; i <= [[${taskcount}]]; i++) {
+                            $(".page" + i).width((parseFloat(result[i + "_nownum"]) / parseFloat(result[i + "_count"])) * 100 + "%");
+                            $(".page" + i).text("总数:" + result[i + "_count"] + ";当前:" + result[i + "_nownum"]);
+                        }
+                        /*if (progress != "error"){
                         var date = progress.substring(0,6);
                         //这里更新进度条的进度和数据
                         $(".progress-bar").width(parseFloat(date)+"%");
                         $(".progress-bar").text(parseFloat(date)+"%");
                     }*/
-                }
-            });
-        }, 1000)
+                    }
+                });
+            }, 1000)
+        }
+
     })
 </script>
 </html>

@@ -1,5 +1,7 @@
 package com.example.demo3.test.service.imp;
 
+import com.example.demo3.test.dao.Roles;
+import com.example.demo3.test.dao.RolesMapper;
 import com.example.demo3.test.dao.User;
 import com.example.demo3.test.dao.UserMapper;
 import com.example.demo3.test.service.IUserService;
@@ -8,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Version 1.0
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements IUserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private RolesMapper rolesMapper;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -26,6 +32,8 @@ public class UserServiceImpl implements IUserService {
         if (user==null){
             user = new User();
         }
+        List<Roles> rolesList = rolesMapper.getRoles(user.getId());
+        user.setRoles(rolesList);
         return user;
     }
 }
