@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="js/bootstrap-paginator.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .page{
+            display: flex;
+            flex-direction: column;
+        }
+        .page .title{
+            font-size: 20px;
+            text-align: center;
+            background-color: aqua;
+        }
+        .page .content{
+            margin-top: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        .page .content .rowcell{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid red;
+        }
+        .page .content .rowcell .item{
+            flex: 1;
+            border-right: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- 标题 -->
+    <div class="title">用户管理界面</div>
+
+    <!-- 展示内容 -->
+    <div class="content">
+        <div class="rowcell hed">
+            <div class="item">主键</div>
+            <div class="item">登录名</div>
+            <div class="item">用户名</div>
+            <div class="item">权限</div>
+            <div class="item">是否可用</div>
+        </div>
+        <div th:each="user:${users}" class="rowcell">
+            <div class="item" th:text="${user.id}"></div>
+            <div class="item" th:text="${user.username}"></div>
+            <div class="item" th:text="${user.nickname}"></div>
+            <!--<div th:each="role:${user.roles}">
+                <span th:text="${role.name}"></span>
+            </div>-->
+            <div class="item" th:text="${user.authorities}"></div>
+            <div class="item" th:text="${user.enabled}"></div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+
+</html>

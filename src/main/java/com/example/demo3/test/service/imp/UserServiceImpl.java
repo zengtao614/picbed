@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,5 +36,12 @@ public class UserServiceImpl implements IUserService {
         List<Roles> rolesList = rolesMapper.getRoles(user.getId());
         user.setRoles(rolesList);
         return user;
+    }
+
+    @Override
+    public List<User> getUserList(String likename) {
+        List<User> userList = new ArrayList<>();
+        userList = userMapper.getAllUsers(likename);
+        return userList;
     }
 }

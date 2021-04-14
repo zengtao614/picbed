@@ -10,6 +10,10 @@
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="userface" property="userface" jdbcType="VARCHAR" />
     <result column="regTime" property="regtime" jdbcType="TIMESTAMP" />
+    <collection property="roles" ofType="com.example.demo3.test.dao.Roles">
+      <id column="rid" property="id"/>
+      <result column="rname" property="name" />
+    </collection>
   </resultMap>
   <sql id="Base_Column_List" >
     id, username, nickname, password, enabled, email, userface, regTime
@@ -26,6 +30,16 @@
     <include refid="Base_Column_List" />
     from USER
     where username = #{username}
+  </select>
+
+  <select id="getAllUsers" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select u.*,r.id rid,r.name rname from USER u,ROLES r,ROLES_USER ru
+    where u.id = ru.uid and r.id = ru.rid
+    <if test="likename !=null">
+      and u.nickname like concat('%',#{likename},'%')
+    </if>
+
+
   </select>
 
 

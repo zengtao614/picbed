@@ -21,4 +21,5 @@ public interface UserMapper {
 
     User loadUserByUsername(String s);
 
+    List<User> getAllUsers(String likename);
 }
