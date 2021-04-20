@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <style>
+        .page{
+            display: flex;
+            flex-direction: column;
+        }
+        .page .title{
+            font-size: 20px;
+            text-align: center;
+            background-color: aqua;
+        }
+        .page .content{
+            margin-top: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        .page .content .piccell{
+            padding: 10px;
+            border-bottom: 1px solid red;
+            display: flex;
+            flex-direction: column;
+        }
+        .page .content .piccell .piccellinfo{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page .content .piccell .procells{
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            overflow-y: auto;
+            max-height: 450px;
+        }
+        .page .content .piccell .procells.remove{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- 标题 -->
+    <div class="title">爬虫进度</div>
+    <div><button onclick="window.location='/picbed'">首页</button></div>
+    <!-- 图片展示内容 -->
+    <div class="content">
+        <div  class="piccell" th:each="crawler : ${crawlerList}" >
+            <div class="piccellinfo">
+                <span th:text="${crawler.craInfo}" />
+                <button th:value="${crawler.craParam}" class="procebut">展开关闭</button>
+            </div>
+
+            <div class="procells remove" th:classappend="${crawler.craParam}">
+                <div th:if="${crawler.craThreadnum}>=1" class="procell" th:each="dayCyc : ${#numbers.sequence(1,crawler.craThreadnum)}" >
+                    <span th:text="第+${dayCyc}+页" />
+                    <div class="progress progress-striped active" style="flex: 1">
+                        <div class="progress-bar progress-bar-success" th:classappend="${crawler.craParam}+page+${dayCyc}" role="progressbar"
+                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                             style="width: 0%;">
+                            0%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(function () {
+                    if([[${crawler.craThreadnum}]]>=1) {
+                        var timingTask = setInterval(function () {
+                            $.ajax({
+                                type: 'post',
+                                url: "./getprogress?containerid=" + [[${crawler.craParam}]],
+                                dataType: 'json',
+                                success: function (result) {
+                                    var cont = [[${crawler.craParam}]]+":";
+                                    for (var i = 1; i <= [[${crawler.craThreadnum}]]; i++) {
+                                        $("."+[[${crawler.craParam}]]+"page" + i).width((parseFloat(result[cont+i + "_nownum"]) / parseFloat(result[cont+i + "_count"])) * 100 + "%");
+                                        $("."+[[${crawler.craParam}]]+"page" + i).text("总数:" + result[cont+i + "_count"] + ";当前:" + result[cont+i + "_nownum"]);
+                                    }
+                                }
+                            });
+                        }, 1000)
+                    }
+                })
+            </script>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<!--定时获取下载进度方法-->
+<script>
+    $(".procebut").click(function () {
+        $(".procells."+$(this).attr("value")).toggleClass("remove");
+        // console.log()
+    })
+</script>
+</html>

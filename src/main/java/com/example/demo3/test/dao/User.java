@@ -130,8 +130,18 @@ public class User implements UserDetails {
         this.regtime = regtime;
     }
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", email='" + email + '\'' +
+                ", userface='" + userface + '\'' +
+                ", regtime=" + regtime +
+                ", roles=" + roles +
+                '}';
+    }
 }

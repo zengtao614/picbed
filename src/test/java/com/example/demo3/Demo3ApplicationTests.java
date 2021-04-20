@@ -13,9 +13,12 @@ import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -25,12 +28,14 @@ class Demo3ApplicationTests {
 
 
 
-/*    @Test
+    @Test
     void contextLoads() {
-        String picur = "https://wx3.sinaimg.cn/large/e9850d5agy1flkww6brgij215o15ox6p.jpg";
-        System.out.println(picur.substring(picur.lastIndexOf("/") + 1));
-
-    }*/
+        //String picur = "https://wx3.sinaimg.cn/large/e9850d5agy1flkww6brgij215o15ox6p.jpg";
+        //System.out.println(picur.substring(picur.lastIndexOf("/") + 1));
+//        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        String response = SpiderUtil.getResponse("https://m.weibo.cn/api/container/getIndex?containerid=2304131792328230&page=511");
+        System.out.println(response);
+    }
 
     /*    @Test
         void httpTest(){
@@ -74,6 +79,8 @@ class Demo3ApplicationTests {
         }*/
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Test
     void redisTest() {
         //存值
@@ -89,6 +96,13 @@ class Demo3ApplicationTests {
             map.put(key, value);
         }
         System.out.println(map);
+    }
+
+    @Test
+    void redisTest2() {
+        //存值
+        Set<String> keys1 = redisTemplate.keys("*1076033591355593:*");
+        System.out.println(keys1);
     }
 
     @Test

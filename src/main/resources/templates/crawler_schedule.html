@@ -34,7 +34,7 @@
 <div class="page">
     <!-- 标题 -->
     <div class="title">爬虫进度</div>
-
+    <div><button onclick="shutdown()">停止</button></div>
     <!-- 图片展示内容 -->
     <div class="content">
         <div th:if="${taskcount}>=1" class="piccell" th:each="dayCyc : ${#numbers.sequence(1,taskcount)}" >
@@ -61,16 +61,16 @@
             var timingTask = setInterval(function () {
                 $.ajax({
                     type: 'post',
-                    url: "./getprogress?page=" + [[${taskcount}]],
+                    url: "./getprogress?containerid=" + [[${containerid}]],
                     dataType: 'json',
                     success: function (result) {
                         //progress = result.value;
-                        console.log(result)
                         //var a = $.parseJSON(result);
-
+                        var cont = [[${containerid}]]+":";
+                        console.log(cont)
                         for (var i = 1; i <= [[${taskcount}]]; i++) {
-                            $(".page" + i).width((parseFloat(result[i + "_nownum"]) / parseFloat(result[i + "_count"])) * 100 + "%");
-                            $(".page" + i).text("总数:" + result[i + "_count"] + ";当前:" + result[i + "_nownum"]);
+                            $(".page" + i).width((parseFloat(result[cont+i + "_nownum"]) / parseFloat(result[cont+i + "_count"])) * 100 + "%");
+                            $(".page" + i).text("总数:" + result[cont+i + "_count"] + ";当前:" + result[cont+i + "_nownum"]);
                         }
                         /*if (progress != "error"){
                         var date = progress.substring(0,6);
@@ -84,5 +84,16 @@
         }
 
     })
+
+    function shutdown() {
+        $.ajax({
+            type: 'get',
+            url: "./shutdownthread",
+            dataType: 'json',
+            success: function (result) {
+
+            }
+        });
+    }
 </script>
 </html>

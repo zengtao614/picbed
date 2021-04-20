@@ -5,7 +5,9 @@ import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     /**
      * 写入缓存
      * @param key
@@ -29,6 +33,23 @@ public class RedisUtil {
         boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            operations.set(key, value);
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    /**
+     * 写入缓存
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean setString(final String key, String value) {
+        boolean result = false;
+        try {
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
             operations.set(key, value);
             result = true;
         } catch (Exception e) {
@@ -74,6 +95,20 @@ public class RedisUtil {
         }
     }
     /**
+     * 批量获取key-value
+     * @param pattern
+     */
+    public Map getPattern(final String pattern) {
+        Set<String> keys = stringRedisTemplate.keys(pattern);
+        Map map = new HashMap();
+        if (keys.size() > 0){
+            for (String key:keys){
+                map.put(key,stringRedisTemplate.opsForValue().get(key));
+            }
+        }
+        return map;
+    }
+    /**
      * 删除对应的value
      * @param key
      */
@@ -99,6 +134,16 @@ public class RedisUtil {
         Object result = null;
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
+        return result;
+    }
+    /**
+     * 读取缓存
+     * @param key
+     * @return
+     */
+    public String getString(final String key) {
+        String result = null;
+        result = stringRedisTemplate.opsForValue().get(key);
         return result;
     }
     /**

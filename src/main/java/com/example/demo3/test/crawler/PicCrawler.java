@@ -11,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 
 
 /**
@@ -31,6 +35,9 @@ public class PicCrawler {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
 
 
     /**
@@ -78,18 +85,22 @@ public class PicCrawler {
             JSONObject jsonObject = JSON.parseObject(content);
             if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
-                redisUtil.set(page+"_count",String.valueOf(jsonArray.size()));
+                redisUtil.setString(containerid+":"+page+"_count",String.valueOf(jsonArray.size()));
+                //redisUtil.set(page+"_count",String.valueOf(jsonArray.size()));
                 for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
-                    if (picsarray != null) {
-                        for (int n = 0; n < picsarray.size(); n++) {
-                            String picurl = (String) picsarray.getJSONObject(n).getJSONObject("large").get("url");
-                            String picname = picurl.substring(picurl.lastIndexOf("/") + 1);
-                            //saveImg(picname, sourcecode, typecode, containerid, picurl);
-                            saveImgTest(picname, sourcecode, typecode, containerid, picurl);
+                    if (jsonArray.getJSONObject(i).getJSONObject("mblog")!=null) {
+                        JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
+                        if (picsarray != null) {
+                            for (int n = 0; n < picsarray.size(); n++) {
+                                String picurl = (String) picsarray.getJSONObject(n).getJSONObject("large").get("url");
+                                String picname = picurl.substring(picurl.lastIndexOf("/") + 1);
+                                //saveImg(picname, sourcecode, typecode, containerid, picurl);
+                                saveImgTest(picname, sourcecode, typecode, containerid, picurl);
+                            }
                         }
                     }
-                    redisUtil.set(page+"_nownum",String.valueOf(i+1));
+                    redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(i+1));
+                    //redisUtil.set(page+"_nownum",String.valueOf(i+1));
                 }
             }
         }
@@ -176,7 +187,7 @@ public class PicCrawler {
                 picInstance.setPicUrl(folderid + "/" + picInstance.getPicName());
                 //picInstanceService.insert(picInstance);
             }
-            Thread.sleep(500);
+            Thread.sleep(100);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(picname + "保存失败");
@@ -184,4 +195,7 @@ public class PicCrawler {
     }
 
 
+    public void shutdownThreadPool() {
+        taskExecutor.getThreadPoolExecutor().shutdownNow();
+    }
 }

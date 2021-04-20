@@ -1,5 +1,6 @@
 package com.example.demo3.test.web.admin;
 
+import com.example.demo3.test.dao.CrawlerLog;
 import com.example.demo3.test.dao.PicSource;
 import com.example.demo3.test.dao.PicType;
 import com.example.demo3.test.service.IPicInstanceService;
@@ -66,18 +67,36 @@ public class CrawlerController {
     public String startwbcrawlerbyid(Model model,@RequestParam(name = "containerid") String containerid,@RequestParam(name = "typecode") String typecode,@RequestParam(name = "sourcecode") String sourcecode){
         int i = picInstanceService.grabWbByidTest(containerid, typecode, sourcecode);
         model.addAttribute("taskcount",i);
-        return "crawler_schedule.html";
+        model.addAttribute("containerid",containerid);
+        //return "crawler_schedule.html";
+        return "redirect:/admin/getAllCrawler";
+    }
+
+    @RequestMapping("/getAllCrawler")
+    public String getAllCrawler(Model model){
+        List<CrawlerLog> crawlerList = picInstanceService.getAllCrawler();
+        model.addAttribute("crawlerList",crawlerList);
+        return "crawlerSchedule.html";
     }
 
     @RequestMapping("/getprogress")
     @ResponseBody
-    public Map getprogress(Model model, @RequestParam(name = "page") String page){
-        Map result = new HashMap();
-        int pagecount = Integer.valueOf(page);
+    public Map getprogress(Model model, @RequestParam(name = "containerid") String containerid){
+        Map result = redisUtil.getPattern("*"+containerid+":*");
+/*        int pagecount = Integer.valueOf(page);
         for (int n=1;n<=pagecount;n++){
             result.put(n+"_count", redisUtil.get(n+"_count"));
             result.put(n+"_nownum",redisUtil.get(n+"_nownum"));
         }
+        containerid*/
         return result;
     }
+
+    @RequestMapping("/shutdownthread")
+    @ResponseBody
+    public String  shutdownthread(Model model){
+        picInstanceService.shutdownThreadPool();
+        return "已停止线程";
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.demo3.test.service;
 
+import com.example.demo3.test.dao.CrawlerLog;
 import com.example.demo3.test.dao.PicInstance;
 import com.github.pagehelper.PageInfo;
 
@@ -65,4 +66,7 @@ public interface IPicInstanceService {
      */
     List<PicInstance> getRandomPic();
 
+    void shutdownThreadPool();
+
+    List<CrawlerLog> getAllCrawler();
 }
