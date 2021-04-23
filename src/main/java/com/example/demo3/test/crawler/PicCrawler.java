@@ -188,9 +188,9 @@ public class PicCrawler {
                 picInstance.setPicUrl(folderid + "/" + picInstance.getPicName());
                 picInstance.setPicOriurl(picurl);
                 picInstance.setPicSavedate(new Date());
+                picInstance.setPicHasdown(0);
                 picInstanceService.insert(picInstance);
             }
-            //Thread.sleep(100);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(picname + "保存失败");
@@ -208,10 +208,10 @@ public class PicCrawler {
         try {
             //下载图片到本地
             SpiderUtil.downloadpic(picurl, SpiderUtil.folder_name + folderid, picname);
-            System.out.println(picname + "保存成功");
+            System.out.println(picname + "下载成功");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(picname + "保存失败");
+            System.out.println(picname + "下载失败");
         }
     }
 

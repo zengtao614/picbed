@@ -68,5 +68,39 @@ public interface IPicInstanceService {
 
     Map shutdownThreadPool();
 
+    /**
+     * 获取存活的爬虫实例数据
+     * @return
+     */
     List<CrawlerLog> getAllCrawler();
+
+    /**
+     * 获取未下载的图片实例
+     * @return
+     */
+    List<PicInstance> getNeeddownpic();
+
+    /**
+     * 获取未下载的图片实例（测试方法，每次只获取20实例）
+     * @return
+     */
+    List<PicInstance> getNeeddownpicTest();
+
+    /**
+     * 修改方法
+     * @param p
+     * @return
+     */
+    int updatePicinstance(PicInstance p);
+
+    /**
+     * 获取数据库图片基本数据
+     * @return
+     */
+    Map getPicdata();
+
+    /**
+     * 立即下载未下载的图片
+     */
+    void sudodownloadpic();
 }

@@ -22,4 +22,10 @@ public interface PicInstanceMapper {
     List<PicInstance> getAllPic(Map params);
 
     List<PicInstance> getRandomPic();
+
+    List<PicInstance> getNeeddownpic();
+
+    List<PicInstance> getNeeddownpicTest();
+
+    Map getPicdata();
 }

@@ -2,6 +2,7 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="referrer" content="no-referrer">
     <title></title>
     <script src="js/jquery-1.12.4.min.js"></script>
     <script src="js/bootstrap-paginator.js"></script>
@@ -45,9 +46,8 @@
     <!-- 图片展示内容 -->
     <div class="content">
         <div th:each="pic:${allPic}" class="piccell">
-            <img  th:src="${pic.picOriurl}" class="picsrc"/>
-<!--            <img th:src="${nginxsite}+${pic.picUrl}" class="picsrc"/>-->
-            <!--<span th:text="${pic.picName}" />-->
+            <img th:if="${pic.picHasdown} == 0" th:src="${pic.picOriurl}" class="picsrc"/>
+            <img th:if="${pic.picHasdown} == 1" th:src="${nginxsite}+${pic.picUrl}" class="picsrc"/>
         </div>
     </div>
 

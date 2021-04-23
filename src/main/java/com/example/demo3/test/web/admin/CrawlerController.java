@@ -99,4 +99,20 @@ public class CrawlerController {
         return map;
     }
 
+
+    @RequestMapping("/picmanage")
+    public String  picmanage(Model model){
+        Map picdata = picInstanceService.getPicdata();
+        model.addAttribute("picdata",picdata);
+        return "picmanage.html";
+    }
+
+
+    @RequestMapping("/sudodownloadpic")
+    @ResponseBody
+    public String  sudodownloadpic(){
+        picInstanceService.sudodownloadpic();
+        return "下载启动";
+    }
+
 }

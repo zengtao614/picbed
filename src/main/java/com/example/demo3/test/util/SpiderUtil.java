@@ -146,6 +146,26 @@ public class SpiderUtil {
     }
 
     /**
+     * 下载图片方法，使用io流方式
+     * @param src 图片资源地址
+
+     * @throws Exception
+     */
+    public static void downloadpic(String src, String path) throws Exception {
+        //文件下载操作
+        URL url = new URL(src);
+        InputStream is = url.openStream();
+        FileOutputStream fos = new FileOutputStream(path);
+        byte[] buf = new byte[1024];
+        int length = 0;
+        while ((length = is.read(buf)) != -1) {
+            fos.write(buf, 0, length);
+        }
+        fos.close();
+        is.close();
+    }
+
+    /**
      * 使用第三方请求库httpclient来请求url，比原生更加好用
      * @param url
      * @return

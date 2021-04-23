@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <style>
+        .page{
+            display: flex;
+            flex-direction: column;
+        }
+        .page .title{
+            font-size: 20px;
+            text-align: center;
+            background-color: aqua;
+        }
+        .page .content{
+            margin-top: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        .page .content .rowcell{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid red;
+        }
+        .page .content .rowcell .item{
+            flex: 1;
+            border-right: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- 标题 -->
+    <div class="title">用户管理界面</div>
+
+    <!-- 展示内容 -->
+    <div class="content">
+        <p th:text="目前数据库总共有+${picdata.allnum}+条数据，已下载的有+${picdata.hasdown}+条数据，未下载的有+${picdata.nodown}+条数据"></p>
+        <button onclick="sudopic()">立即下载图片</button>
+        <button onclick="window.location='/picbed'">首页</button>
+    </div>
+</div>
+</div>
+</body>
+<script>
+    function sudopic() {
+        $.ajax({
+            type: 'get',
+            url: "./sudodownloadpic",
+            success: function (result) {
+                alert(result)
+            }
+        });
+    }
+
+</script>
+
+</html>

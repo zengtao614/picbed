@@ -161,4 +161,41 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     public List<CrawlerLog> getAllCrawler() {
         return crawlerLogMapper.getAllCrawler();
     }
+
+    @Override
+    public List<PicInstance> getNeeddownpic() {
+        return picInstanceMapper.getNeeddownpic();
+    }
+
+    @Override
+    public List<PicInstance> getNeeddownpicTest() {
+        return picInstanceMapper.getNeeddownpicTest();
+    }
+
+    @Override
+    public int updatePicinstance(PicInstance p) {
+        return picInstanceMapper.updateByPrimaryKey(p);
+    }
+
+    @Override
+    public Map getPicdata() {
+        return picInstanceMapper.getPicdata();
+    }
+
+    @Override
+    public void sudodownloadpic() {
+        List<PicInstance> picList = getNeeddownpic();
+        for (PicInstance p:picList){
+            try {
+                SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
+                p.setPicHasdown(1);
+                updatePicinstance(p);
+                System.out.println(p.getPicName() + "下载成功");
+            }catch (Exception e){
+                e.printStackTrace();
+                System.out.println(p.getPicName() + "下载失败");
+            }
+
+        }
+    }
 }

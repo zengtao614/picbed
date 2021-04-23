@@ -37,7 +37,7 @@ public class TestService {
     }
 
 
-    @Test
+
     public void threadTest(){
         stringRedisTemplate.opsForValue().set("num",String.valueOf(0));
         ThreadPoolExecutor poolExecutor =

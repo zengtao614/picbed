@@ -17,7 +17,7 @@ public class Test {
     @Autowired
     private TestService testService;
 
-    @org.junit.jupiter.api.Test
+
     public void threadTest(){
         /*PausableThreadPoolExecutor poolExecutor =
                 new PausableThreadPoolExecutor(10, 10, 1000L,

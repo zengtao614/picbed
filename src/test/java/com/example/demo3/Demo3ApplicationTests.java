@@ -28,7 +28,7 @@ class Demo3ApplicationTests {
 
 
 
-    @Test
+
     void contextLoads() {
         //String picur = "https://wx3.sinaimg.cn/large/e9850d5agy1flkww6brgij215o15ox6p.jpg";
         //System.out.println(picur.substring(picur.lastIndexOf("/") + 1));
@@ -81,7 +81,7 @@ class Demo3ApplicationTests {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Test
+
     void redisTest() {
         //存值
         stringRedisTemplate.opsForValue().set("myname","zt");
@@ -98,14 +98,14 @@ class Demo3ApplicationTests {
         System.out.println(map);
     }
 
-    @Test
+
     void redisTest2() {
         //存值
         Set<String> keys1 = redisTemplate.keys("*1076033591355593:*");
         System.out.println(keys1);
     }
 
-    @Test
+
     void threadTest() {
         ThreadPoolExecutor poolExecutor =
                 new ThreadPoolExecutor(10, 10, 1000L,

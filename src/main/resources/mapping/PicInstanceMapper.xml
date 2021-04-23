@@ -9,10 +9,13 @@
     <result column="PIC_SOURCE" property="picSource" jdbcType="INTEGER" />
     <result column="PIC_ORIURL" property="picOriurl" jdbcType="VARCHAR" />
     <result column="PIC_SAVEDATE" property="picSavedate" jdbcType="DATE" />
+    <result column="PIC_HASDOWN" property="picHasdown" jdbcType="INTEGER" />
   </resultMap>
+
   <sql id="Base_Column_List" >
-    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE
+    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN
   </sql>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
@@ -40,6 +43,24 @@
     ORDER BY  RAND() LIMIT 20
   </select>
 
+  <select id="getNeeddownpic" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from PICINSTANCE
+    where PIC_HASDOWN = 0
+  </select>
+
+  <select id="getPicdata" resultType="java.util.Map">
+    select count(PIC_HASDOWN=0) nodown,count(PIC_HASDOWN=1) hasdown, count(*) allnum from PICINSTANCE
+  </select>
+
+  <select id="getNeeddownpicTest" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from PICINSTANCE
+    where PIC_HASDOWN = 0 limit 20
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from PICINSTANCE
     where ID = #{id,jdbcType=VARCHAR}
@@ -47,9 +68,9 @@
 
   <insert id="insert" parameterType="com.example.demo3.test.dao.PicInstance" >
     insert into PICINSTANCE (ID, PIC_NAME, PIC_URL, 
-      PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE)
+      PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN)
     values (#{id,jdbcType=VARCHAR}, #{picName,jdbcType=VARCHAR}, #{picUrl,jdbcType=VARCHAR}, 
-      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER},#{picOriurl,jdbcType=VARCHAR},#{picSavedate,jdbcType=DATE})
+      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER},#{picOriurl,jdbcType=VARCHAR},#{picSavedate,jdbcType=DATE},#{picHasdown,jdbcType=INTEGER})
   </insert>
 
 
@@ -60,7 +81,8 @@
       PIC_TYPECODE = #{picTypecode,jdbcType=INTEGER},
       PIC_SOURCE = #{picSource,jdbcType=INTEGER},
       PIC_ORIURL = #{picOriurl,jdbcType=VARCHAR},
-      PIC_SAVEDATE = #{picSavedate,jdbcType=DATE}
+      PIC_SAVEDATE = #{picSavedate,jdbcType=DATE},
+      PIC_HASDOWN = #{picHasdown,jdbcType=INTEGER}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

@@ -2,6 +2,7 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="referrer" content="no-referrer">
     <title></title>
     <script src="js/jquery-1.12.4.min.js"></script>
     <script src="js/bootstrap-paginator.js"></script>
@@ -73,10 +74,8 @@
     <!-- 图片展示内容 -->
     <div class="content">
         <div th:each="pic:${allPic.list}" class="piccell">
-<!--            此处应判断图片得存入时间大于当前时间24小时，暂时不做判断全部用图片源url展示图片(图片下载暂时不好操作)-->
-            <img  th:src="${pic.picOriurl}" class="picsrc"/>
-<!--            <img th:if="" th:src="${nginxsite}+${pic.picUrl}" class="picsrc"/>-->
-<!--            <span th:text="${pic.picSavedate}" />-->
+            <img th:if="${pic.picHasdown} == 0" th:src="${pic.picOriurl}" class="picsrc"/>
+            <img th:if="${pic.picHasdown} == 1" th:src="${nginxsite}+${pic.picUrl}" class="picsrc"/>
         </div>
     </div>
     <div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:99;width:100%;height:100%;display:none;">
@@ -97,6 +96,7 @@
         <a href="./admin/startcrawler">启动爬虫</a>
         <a href="./randompic">随机图片</a>
         <a href="./admin/getAllCrawler">爬虫进度查看</a>
+        <a href="./admin/picmanage">图片管理</a>
     </div>
 </div>
 </body>

@@ -17,6 +17,16 @@ public class PicInstance {
 
     private Date picSavedate;
 
+    private Integer picHasdown;
+
+    public Integer getPicHasdown() {
+        return picHasdown;
+    }
+
+    public void setPicHasdown(Integer picHasdown) {
+        this.picHasdown = picHasdown;
+    }
+
     public String getPicOriurl() {
         return picOriurl;
     }
