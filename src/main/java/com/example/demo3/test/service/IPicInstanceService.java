@@ -66,7 +66,7 @@ public interface IPicInstanceService {
      */
     List<PicInstance> getRandomPic();
 
-    void shutdownThreadPool();
+    Map shutdownThreadPool();
 
     List<CrawlerLog> getAllCrawler();
 }

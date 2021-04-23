@@ -23,6 +23,7 @@ public class RedisUtil {
     private RedisTemplate redisTemplate;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
     /**
      * 写入缓存
      * @param key
@@ -57,6 +58,31 @@ public class RedisUtil {
         }
         return result;
     }
+
+    public synchronized boolean setInt(String key, int value) {
+        boolean result = false;
+        try {
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            operations.set(key, String.valueOf(value));
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public synchronized boolean setIntAdd(String key) {
+        boolean result = false;
+        try {
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            operations.set(key, String.valueOf(Integer.valueOf(getString(key))+1));
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 写入缓存设置时效时间
      * @param key
@@ -225,5 +251,6 @@ public class RedisUtil {
         ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
         return zset.rangeByScore(key, scoure, scoure1);
     }
+
 
 }

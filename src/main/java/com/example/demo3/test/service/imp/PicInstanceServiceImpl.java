@@ -134,6 +134,7 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                  */
                 for (int i=1;i<=page;i++){
                     String pageurl = url + "&page=" + i;
+                    redisUtil.setString(containerid + ":allpage",String.valueOf(0));
                     picCrawler.wbspiderRun(pageurl,containerid,typecode,sourcecode,i);
                 }
                 return page;
@@ -152,8 +153,8 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     }
 
     @Override
-    public void shutdownThreadPool() {
-        picCrawler.shutdownThreadPool();
+    public Map shutdownThreadPool() {
+        return picCrawler.shutdownThreadPool();
     }
 
     @Override

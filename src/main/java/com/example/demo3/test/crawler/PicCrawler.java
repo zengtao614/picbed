@@ -14,10 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 
@@ -86,7 +83,6 @@ public class PicCrawler {
             if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
                 redisUtil.setString(containerid+":"+page+"_count",String.valueOf(jsonArray.size()));
-                //redisUtil.set(page+"_count",String.valueOf(jsonArray.size()));
                 for (int i = 0; i < jsonArray.size(); i++) {
                     if (jsonArray.getJSONObject(i).getJSONObject("mblog")!=null) {
                         JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
@@ -100,11 +96,14 @@ public class PicCrawler {
                         }
                     }
                     redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(i+1));
-                    //redisUtil.set(page+"_nownum",String.valueOf(i+1));
                 }
+            }else {
+                redisUtil.setString(containerid+":"+page+"_count",String.valueOf(0));
+                redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(0));
             }
         }
         System.out.println("第"+page+"已爬取完毕");
+        redisUtil.setIntAdd(containerid+":allpage");
     }
 
     /**
@@ -117,7 +116,7 @@ public class PicCrawler {
     @Async("taskExecutor")
     public void hbspiderRun(String boardid, String typecode, String sourcecode) {
         try {
-            SpiderUtil.createFolder(SpiderUtil.folder_name + boardid + "\\");
+            SpiderUtil.createFolder(SpiderUtil.folder_name + boardid);
             String url = SpiderUtil.HUABAN_BOARDSITE + boardid;
             String thisUrl = url;
             while (true) {
@@ -156,9 +155,11 @@ public class PicCrawler {
                 picInstance.setPicSource(Integer.valueOf(sourcecode));
                 picInstance.setPicTypecode(Integer.valueOf(typecode));
                 picInstance.setPicUrl(folderid + "/" + picInstance.getPicName());
+                picInstance.setPicOriurl(picurl);
+                picInstance.setPicSavedate(new Date());
                 picInstanceService.insert(picInstance);
                 //下载图片到本地
-                SpiderUtil.downloadpic(picurl, SpiderUtil.folder_name + folderid + "\\", picname);
+                SpiderUtil.downloadpic(picurl, SpiderUtil.folder_name + folderid, picname);
                 System.out.println(picname + "保存成功");
             }
         } catch (Exception e) {
@@ -185,17 +186,40 @@ public class PicCrawler {
                 picInstance.setPicSource(Integer.valueOf(sourcecode));
                 picInstance.setPicTypecode(Integer.valueOf(typecode));
                 picInstance.setPicUrl(folderid + "/" + picInstance.getPicName());
-                //picInstanceService.insert(picInstance);
+                picInstance.setPicOriurl(picurl);
+                picInstance.setPicSavedate(new Date());
+                picInstanceService.insert(picInstance);
             }
-            Thread.sleep(100);
+            //Thread.sleep(100);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(picname + "保存失败");
+        }
+    }
+    /**
+     * 模拟存储图片，删去下载操作，节省流量
+     * @param picname
+     * @param sourcecode
+     * @param typecode
+     * @param folderid
+     * @param picurl
+     */
+    public void saveImgTest2(String picname, String sourcecode, String typecode, String folderid, String picurl) {
+        try {
+            //下载图片到本地
+            SpiderUtil.downloadpic(picurl, SpiderUtil.folder_name + folderid, picname);
+            System.out.println(picname + "保存成功");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(picname + "保存失败");
         }
     }
 
-
-    public void shutdownThreadPool() {
-        taskExecutor.getThreadPoolExecutor().shutdownNow();
+    public Map shutdownThreadPool() {
+        Map map = new HashMap();
+        map.put("总任务数",taskExecutor.getThreadPoolExecutor().getTaskCount());
+        map.put("还剩任务数",taskExecutor.getThreadPoolExecutor().getQueue().size());
+        map.put("完成任务数",taskExecutor.getThreadPoolExecutor().getCompletedTaskCount());
+        return map;
     }
 }

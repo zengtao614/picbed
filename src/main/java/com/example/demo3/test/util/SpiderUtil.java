@@ -135,7 +135,7 @@ public class SpiderUtil {
         //文件下载操作
         URL url = new URL(src);
         InputStream is = url.openStream();
-        FileOutputStream fos = new FileOutputStream(foldername + picname);
+        FileOutputStream fos = new FileOutputStream(foldername + "/" + picname);
         byte[] buf = new byte[1024];
         int length = 0;
         while ((length = is.read(buf)) != -1) {

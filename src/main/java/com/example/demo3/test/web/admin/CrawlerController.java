@@ -94,9 +94,9 @@ public class CrawlerController {
 
     @RequestMapping("/shutdownthread")
     @ResponseBody
-    public String  shutdownthread(Model model){
-        picInstanceService.shutdownThreadPool();
-        return "已停止线程";
+    public Map  shutdownthread(){
+        Map map = picInstanceService.shutdownThreadPool();
+        return map;
     }
 
 }

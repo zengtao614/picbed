@@ -15,6 +15,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 public class TaskPoolConfig {
+    /**
+     * 想法是一个单独存数据到数据库的线程池，一个负责下载图片的线程
+     * @return
+     */
 
     @Bean("taskExecutor")
     public ThreadPoolTaskExecutor taskExecutro(){
@@ -28,4 +32,19 @@ public class TaskPoolConfig {
         taskExecutor.setAwaitTerminationSeconds(60);
         return taskExecutor;
     }
+
+/*    @Bean("downloadTaskExecutor")
+    public ThreadPoolTaskExecutor downloadTaskExecutor(){
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(10);
+        taskExecutor.setMaxPoolSize(20);
+        taskExecutor.setQueueCapacity(1000);
+        taskExecutor.setKeepAliveSeconds(60);
+        taskExecutor.setThreadNamePrefix("downloadTaskExecutor--");
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        taskExecutor.setAwaitTerminationSeconds(60);
+        return taskExecutor;
+    }*/
+
+
 }

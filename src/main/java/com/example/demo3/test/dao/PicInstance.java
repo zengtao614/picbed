@@ -1,5 +1,7 @@
 package com.example.demo3.test.dao;
 
+import java.util.Date;
+
 public class PicInstance {
     private String id;
 
@@ -10,6 +12,26 @@ public class PicInstance {
     private Integer picTypecode;
 
     private Integer picSource;
+
+    private String picOriurl;
+
+    private Date picSavedate;
+
+    public String getPicOriurl() {
+        return picOriurl;
+    }
+
+    public void setPicOriurl(String picOriurl) {
+        this.picOriurl = picOriurl;
+    }
+
+    public Date getPicSavedate() {
+        return picSavedate;
+    }
+
+    public void setPicSavedate(Date picSavedate) {
+        this.picSavedate = picSavedate;
+    }
 
     public String getId() {
         return id;

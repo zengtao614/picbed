@@ -7,9 +7,11 @@
     <result column="PIC_URL" property="picUrl" jdbcType="VARCHAR" />
     <result column="PIC_TYPECODE" property="picTypecode" jdbcType="INTEGER" />
     <result column="PIC_SOURCE" property="picSource" jdbcType="INTEGER" />
+    <result column="PIC_ORIURL" property="picOriurl" jdbcType="VARCHAR" />
+    <result column="PIC_SAVEDATE" property="picSavedate" jdbcType="DATE" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE
+    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -42,73 +44,23 @@
     delete from PICINSTANCE
     where ID = #{id,jdbcType=VARCHAR}
   </delete>
+
   <insert id="insert" parameterType="com.example.demo3.test.dao.PicInstance" >
     insert into PICINSTANCE (ID, PIC_NAME, PIC_URL, 
-      PIC_TYPECODE, PIC_SOURCE)
+      PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE)
     values (#{id,jdbcType=VARCHAR}, #{picName,jdbcType=VARCHAR}, #{picUrl,jdbcType=VARCHAR}, 
-      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER})
+      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER},#{picOriurl,jdbcType=VARCHAR},#{picSavedate,jdbcType=DATE})
   </insert>
-  <insert id="insertSelective" parameterType="com.example.demo3.test.dao.PicInstance" >
-    insert into PICINSTANCE
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        ID,
-      </if>
-      <if test="picName != null" >
-        PIC_NAME,
-      </if>
-      <if test="picUrl != null" >
-        PIC_URL,
-      </if>
-      <if test="picTypecode != null" >
-        PIC_TYPECODE,
-      </if>
-      <if test="picSource != null" >
-        PIC_SOURCE,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="picName != null" >
-        #{picName,jdbcType=VARCHAR},
-      </if>
-      <if test="picUrl != null" >
-        #{picUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="picTypecode != null" >
-        #{picTypecode,jdbcType=INTEGER},
-      </if>
-      <if test="picSource != null" >
-        #{picSource,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.example.demo3.test.dao.PicInstance" >
-    update PICINSTANCE
-    <set >
-      <if test="picName != null" >
-        PIC_NAME = #{picName,jdbcType=VARCHAR},
-      </if>
-      <if test="picUrl != null" >
-        PIC_URL = #{picUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="picTypecode != null" >
-        PIC_TYPECODE = #{picTypecode,jdbcType=INTEGER},
-      </if>
-      <if test="picSource != null" >
-        PIC_SOURCE = #{picSource,jdbcType=INTEGER},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
+
+
   <update id="updateByPrimaryKey" parameterType="com.example.demo3.test.dao.PicInstance" >
     update PICINSTANCE
     set PIC_NAME = #{picName,jdbcType=VARCHAR},
       PIC_URL = #{picUrl,jdbcType=VARCHAR},
       PIC_TYPECODE = #{picTypecode,jdbcType=INTEGER},
-      PIC_SOURCE = #{picSource,jdbcType=INTEGER}
+      PIC_SOURCE = #{picSource,jdbcType=INTEGER},
+      PIC_ORIURL = #{picOriurl,jdbcType=VARCHAR},
+      PIC_SAVEDATE = #{picSavedate,jdbcType=DATE}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

@@ -15,11 +15,7 @@ public interface PicInstanceMapper {
 
     int insert(PicInstance record);
 
-    int insertSelective(PicInstance record);
-
     PicInstance selectByPrimaryKey(String id);
-
-    int updateByPrimaryKeySelective(PicInstance record);
 
     int updateByPrimaryKey(PicInstance record);
 
