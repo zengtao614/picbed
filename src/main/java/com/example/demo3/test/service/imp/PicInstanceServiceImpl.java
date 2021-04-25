@@ -132,9 +132,10 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                 /**
                  * ============创建爬虫记录数据==============
                  */
+                redisUtil.setString(containerid + ":allpage",String.valueOf(0));
+                redisUtil.setString(containerid + ":countpage",String.valueOf(page));
                 for (int i=1;i<=page;i++){
                     String pageurl = url + "&page=" + i;
-                    redisUtil.setString(containerid + ":allpage",String.valueOf(0));
                     picCrawler.wbspiderRun(pageurl,containerid,typecode,sourcecode,i);
                 }
                 return page;
@@ -184,18 +185,42 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public void sudodownloadpic() {
+        System.out.println("手动下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         List<PicInstance> picList = getNeeddownpic();
+        int successDown = 0;
+        int failDown = 0;
         for (PicInstance p:picList){
             try {
                 SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
                 p.setPicHasdown(1);
                 updatePicinstance(p);
+                successDown += 1;
                 System.out.println(p.getPicName() + "下载成功");
             }catch (Exception e){
                 e.printStackTrace();
+                failDown += 1;
                 System.out.println(p.getPicName() + "下载失败");
             }
-
         }
+        System.out.println("定时下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+    }
+
+    @Override
+    public void setDeadSpider(String containerid) {
+        crawlerLogMapper.setDeadSpider(containerid);
+    }
+
+    @Override
+    public Map getprogress(String containerid) {
+        Map spiderProgress = redisUtil.getPattern("*" + containerid + ":*");
+        /**
+         * 判断进度数是否等于总数，如果等于则判断此爬虫爬取完毕，删掉redis中对应的所有数据。
+         */
+        String allpage = (String) spiderProgress.get(containerid+":allpage");
+        String countpage = (String) spiderProgress.get(containerid+":countpage");
+        if (allpage.equals(countpage)){
+            redisUtil.removeStringPattern(containerid+":*");
+        }
+        return spiderProgress;
     }
 }

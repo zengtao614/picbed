@@ -20,4 +20,6 @@ public interface CrawlerLogMapper {
     int updateByPrimaryKey(CrawlerLog record);
 
     List<CrawlerLog> getAllCrawler();
+
+    void setDeadSpider(String containerid);
 }

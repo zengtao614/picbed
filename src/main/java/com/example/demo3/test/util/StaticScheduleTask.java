@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,22 +33,26 @@ public class StaticScheduleTask {
      */
     //@Scheduled(cron = "0/5 * * * * ?")
     //或直接指定时间间隔，例如：5秒
-    /*@Scheduled(fixedRate=40000)
+    @Scheduled(cron = "0 0 0 ? * 2-7")//除了每周周日外每天晚上12点自动执行图片下载方法
     private void downloadPic() {
-        System.out.println("定时下载图片任务开始");
+        System.out.println("定时下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         List<PicInstance> picList = picInstanceService.getNeeddownpicTest();
+        int successDown = 0;
+        int failDown = 0;
         for (PicInstance p:picList){
             try {
                 SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
                 p.setPicHasdown(1);
                 picInstanceService.updatePicinstance(p);
+                successDown += 1;
                 System.out.println(p.getPicName() + "下载成功");
             }catch (Exception e){
                 e.printStackTrace();
+                failDown += 1;
                 System.out.println(p.getPicName() + "下载失败");
             }
 
         }
-        System.out.println("定时下载图片任务结束");
-    }*/
+        System.out.println("定时下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+    }
 }

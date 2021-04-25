@@ -15,10 +15,5 @@ public class Demo3Application extends SpringBootServletInitializer {
         SpringApplication.run(Demo3Application.class, args);
     }
 
-/*    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(Demo3Application.class);
-    }*/
-
 
 }

@@ -27,7 +27,7 @@
     select
     <include refid="Base_Column_List" />
     from CRAWLER_LOG
-    where cra_isalive = '1'
+--     where cra_isalive = '1'
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
@@ -147,4 +147,13 @@
       cra_threadnum = #{craThreadnum,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <update id="setDeadSpider" parameterType="java.lang.String" >
+    update CRAWLER_LOG
+    set cra_isalive = 0
+    where cra_param = #{containerid,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

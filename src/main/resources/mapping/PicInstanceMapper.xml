@@ -51,7 +51,7 @@
   </select>
 
   <select id="getPicdata" resultType="java.util.Map">
-    select count(PIC_HASDOWN=0) nodown,count(PIC_HASDOWN=1) hasdown, count(*) allnum from PICINSTANCE
+    select count(PIC_HASDOWN=0 or null) nodown,count(PIC_HASDOWN=1 or null) hasdown, count(*) allnum from PICINSTANCE
   </select>
 
   <select id="getNeeddownpicTest" resultMap="BaseResultMap">

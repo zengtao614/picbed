@@ -59,7 +59,7 @@ public class RedisUtil {
         return result;
     }
 
-    public synchronized boolean setInt(String key, int value) {
+    public  boolean setInt(String key, int value) {
         boolean result = false;
         try {
             ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
@@ -118,6 +118,17 @@ public class RedisUtil {
         Set<Serializable> keys = redisTemplate.keys(pattern);
         if (keys.size() > 0){
             redisTemplate.delete(keys);
+        }
+    }
+
+    /**
+     * 删除String类型的key
+     * @param pattern
+     */
+    public void removeStringPattern(final String pattern) {
+        Set<String> keys = stringRedisTemplate.keys(pattern);
+        if (keys.size() > 0){
+            stringRedisTemplate.delete(keys);
         }
     }
     /**

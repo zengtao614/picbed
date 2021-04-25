@@ -90,7 +90,6 @@ public class PicCrawler {
                             for (int n = 0; n < picsarray.size(); n++) {
                                 String picurl = (String) picsarray.getJSONObject(n).getJSONObject("large").get("url");
                                 String picname = picurl.substring(picurl.lastIndexOf("/") + 1);
-                                //saveImg(picname, sourcecode, typecode, containerid, picurl);
                                 saveImgTest(picname, sourcecode, typecode, containerid, picurl);
                             }
                         }
@@ -101,9 +100,13 @@ public class PicCrawler {
                 redisUtil.setString(containerid+":"+page+"_count",String.valueOf(0));
                 redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(0));
             }
+        }else {
+            redisUtil.setString(containerid+":"+page+"_count",String.valueOf(0));
+            redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(0));
         }
         System.out.println("第"+page+"已爬取完毕");
-        redisUtil.setIntAdd(containerid+":allpage");
+        setSpiderProgress(containerid);
+//        redisUtil.setIntAdd(containerid+":allpage");
     }
 
     /**
@@ -215,6 +218,10 @@ public class PicCrawler {
         }
     }
 
+    /**
+     * 未使用
+     * @return
+     */
     public Map shutdownThreadPool() {
         Map map = new HashMap();
         map.put("总任务数",taskExecutor.getThreadPoolExecutor().getTaskCount());
@@ -222,4 +229,18 @@ public class PicCrawler {
         map.put("完成任务数",taskExecutor.getThreadPoolExecutor().getCompletedTaskCount());
         return map;
     }
+
+    public synchronized void setSpiderProgress(String containerid){
+        int allpage = Integer.valueOf(redisUtil.getString(containerid + ":allpage"));
+        int countpage = Integer.valueOf(redisUtil.getString(containerid + ":countpage"));
+        redisUtil.setInt(containerid + ":allpage",allpage+1);
+        if (allpage+1 == countpage){
+            //修改此爬虫的状态为0
+            picInstanceService.setDeadSpider(containerid);
+            //删除该爬虫的redis数据,此处删除会导致前端获取的进度数据不全和获取不到
+            //redisUtil.removeStringPattern(containerid+":*");
+            System.out.println("这个爬虫爬完了，爬虫id:"+containerid);
+        }
+    }
+
 }

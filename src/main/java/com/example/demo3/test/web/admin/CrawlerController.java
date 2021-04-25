@@ -34,8 +34,6 @@ public class CrawlerController {
     private IPicSourceService picSourceService;
     @Autowired
     private IPicInstanceService picInstanceService;
-    @Autowired
-    private RedisUtil redisUtil;
 
     @RequestMapping("/startcrawler")
     public String startcrawler(Model model){
@@ -82,13 +80,7 @@ public class CrawlerController {
     @RequestMapping("/getprogress")
     @ResponseBody
     public Map getprogress(Model model, @RequestParam(name = "containerid") String containerid){
-        Map result = redisUtil.getPattern("*"+containerid+":*");
-/*        int pagecount = Integer.valueOf(page);
-        for (int n=1;n<=pagecount;n++){
-            result.put(n+"_count", redisUtil.get(n+"_count"));
-            result.put(n+"_nownum",redisUtil.get(n+"_nownum"));
-        }
-        containerid*/
+        Map result = picInstanceService.getprogress(containerid);
         return result;
     }
 

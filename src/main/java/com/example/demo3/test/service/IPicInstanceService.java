@@ -103,4 +103,17 @@ public interface IPicInstanceService {
      * 立即下载未下载的图片
      */
     void sudodownloadpic();
+
+    /**
+     * 爬虫完成后将爬虫状态设为0（死亡）
+     * @param containerid
+     */
+    void setDeadSpider(String containerid);
+
+    /**
+     * 根据爬虫参数获取爬虫进度
+     * @param containerid
+     * @return
+     */
+    Map getprogress(String containerid);
 }
