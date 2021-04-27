@@ -1,5 +1,6 @@
 package com.example.demo3.test.service;
 
+import com.example.demo3.test.dao.BlogUser;
 import com.example.demo3.test.dao.CrawlerLog;
 import com.example.demo3.test.dao.PicInstance;
 import com.github.pagehelper.PageInfo;
@@ -102,7 +103,7 @@ public interface IPicInstanceService {
     /**
      * 立即下载未下载的图片
      */
-    void sudodownloadpic();
+    Map sudodownloadpic();
 
     /**
      * 爬虫完成后将爬虫状态设为0（死亡）
@@ -116,4 +117,23 @@ public interface IPicInstanceService {
      * @return
      */
     Map getprogress(String containerid);
+
+    /**
+     * 获取数据库所有已爬取的博主数据以及博主对应的图片数据
+     * @return
+     */
+    List<BlogUser> getAllBlogUser();
+
+    /**
+     * 获取数据库图片基本数据从redis中查询
+     * @return
+     */
+    Map getPicdataInredis();
+
+    /**
+     * 根据爬虫参数id删除所有此id对应的图片数据以及博主图片(本地图片不删，只删除数据库数据)
+     * @param containerid
+     * @return
+     */
+    void deletepicForbloguser(String containerid);
 }

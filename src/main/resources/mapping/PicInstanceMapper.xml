@@ -10,10 +10,11 @@
     <result column="PIC_ORIURL" property="picOriurl" jdbcType="VARCHAR" />
     <result column="PIC_SAVEDATE" property="picSavedate" jdbcType="DATE" />
     <result column="PIC_HASDOWN" property="picHasdown" jdbcType="INTEGER" />
+    <result column="PIC_BLOGUSER" property="picBloguser" jdbcType="VARCHAR" />
   </resultMap>
 
   <sql id="Base_Column_List" >
-    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN
+    ID, PIC_NAME, PIC_URL, PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN,PIC_BLOGUSER
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -66,11 +67,17 @@
     where ID = #{id,jdbcType=VARCHAR}
   </delete>
 
+  <delete id="deletePicbycontainerid" parameterType="java.lang.String" >
+    delete from PICINSTANCE
+    where PIC_BLOGUSER = #{containerid,jdbcType=VARCHAR}
+  </delete>
+
   <insert id="insert" parameterType="com.example.demo3.test.dao.PicInstance" >
     insert into PICINSTANCE (ID, PIC_NAME, PIC_URL, 
-      PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN)
+      PIC_TYPECODE, PIC_SOURCE,PIC_ORIURL,PIC_SAVEDATE,PIC_HASDOWN,PIC_BLOGUSER)
     values (#{id,jdbcType=VARCHAR}, #{picName,jdbcType=VARCHAR}, #{picUrl,jdbcType=VARCHAR}, 
-      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER},#{picOriurl,jdbcType=VARCHAR},#{picSavedate,jdbcType=DATE},#{picHasdown,jdbcType=INTEGER})
+      #{picTypecode,jdbcType=INTEGER}, #{picSource,jdbcType=INTEGER},#{picOriurl,jdbcType=VARCHAR},#{picSavedate,jdbcType=DATE}
+      ,#{picHasdown,jdbcType=INTEGER},#{picBloguser,jdbcType=VARCHAR})
   </insert>
 
 
@@ -82,7 +89,8 @@
       PIC_SOURCE = #{picSource,jdbcType=INTEGER},
       PIC_ORIURL = #{picOriurl,jdbcType=VARCHAR},
       PIC_SAVEDATE = #{picSavedate,jdbcType=DATE},
-      PIC_HASDOWN = #{picHasdown,jdbcType=INTEGER}
+      PIC_HASDOWN = #{picHasdown,jdbcType=INTEGER},
+      PIC_BLOGUSER = #{picBloguser,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

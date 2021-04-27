@@ -162,6 +162,15 @@ public class RedisUtil {
     public boolean exists(final String key) {
         return redisTemplate.hasKey(key);
     }
+
+    /**
+     * 判断缓存中是否有对应的value
+     * @param key
+     * @return
+     */
+    public boolean existsStrkey(final String key) {
+        return stringRedisTemplate.hasKey(key);
+    }
     /**
      * 读取缓存
      * @param key

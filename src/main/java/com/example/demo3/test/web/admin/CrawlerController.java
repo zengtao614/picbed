@@ -1,5 +1,6 @@
 package com.example.demo3.test.web.admin;
 
+import com.example.demo3.test.dao.BlogUser;
 import com.example.demo3.test.dao.CrawlerLog;
 import com.example.demo3.test.dao.PicSource;
 import com.example.demo3.test.dao.PicType;
@@ -7,6 +8,7 @@ import com.example.demo3.test.service.IPicInstanceService;
 import com.example.demo3.test.service.IPicSourceService;
 import com.example.demo3.test.service.IPicTypeService;
 import com.example.demo3.test.util.RedisUtil;
+import com.example.demo3.test.util.SpiderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,8 +81,15 @@ public class CrawlerController {
 
     @RequestMapping("/getprogress")
     @ResponseBody
-    public Map getprogress(Model model, @RequestParam(name = "containerid") String containerid){
+    public Map getprogress(@RequestParam(name = "containerid") String containerid){
         Map result = picInstanceService.getprogress(containerid);
+        return result;
+    }
+
+    @RequestMapping("/getmainprogress")
+    @ResponseBody
+    public Map getmainprogress(){
+        Map result = picInstanceService.getPicdataInredis();
         return result;
     }
 
@@ -95,16 +104,25 @@ public class CrawlerController {
     @RequestMapping("/picmanage")
     public String  picmanage(Model model){
         Map picdata = picInstanceService.getPicdata();
+        List<BlogUser> blogUsers =  picInstanceService.getAllBlogUser();
         model.addAttribute("picdata",picdata);
+        model.addAttribute("blogusers",blogUsers);
+        model.addAttribute("nginxsite", SpiderUtil.nginxsite);
         return "picmanage.html";
     }
 
 
+    @RequestMapping("/deletepicForbloguser")
+    @ResponseBody
+    public String  deletepicForbloguser(@RequestParam String containerid){
+        picInstanceService.deletepicForbloguser(containerid);
+        return "删除成功!";
+    }
+
     @RequestMapping("/sudodownloadpic")
     @ResponseBody
-    public String  sudodownloadpic(){
-        picInstanceService.sudodownloadpic();
-        return "下载启动";
+    public Map  sudodownloadpic(){
+        return picInstanceService.sudodownloadpic();
     }
 
 }

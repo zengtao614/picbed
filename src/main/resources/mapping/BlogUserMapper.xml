@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo3.test.dao.BlogUserMapper" >
+  <resultMap id="BaseResultMap" type="com.example.demo3.test.dao.BlogUser" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="WEIBO_ID" property="weiboId" jdbcType="VARCHAR" />
+    <result column="SCREEN_NAME" property="screenName" jdbcType="VARCHAR" />
+    <result column="PROFILE_URL" property="profileUrl" jdbcType="VARCHAR" />
+    <result column="VERIFIED_REASON" property="verifiedReason" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="IMAGE" property="image" jdbcType="VARCHAR" />
+    <result column="CONTAINERID" property="containerid" jdbcType="VARCHAR" />
+    <collection property="picInstances" ofType="com.example.demo3.test.dao.PicInstance">
+      <id column="PIC_ID" property="id" jdbcType="VARCHAR" />
+      <result column="PIC_NAME" property="picName" jdbcType="VARCHAR" />
+      <result column="PIC_URL" property="picUrl" jdbcType="VARCHAR" />
+      <result column="PIC_TYPECODE" property="picTypecode" jdbcType="INTEGER" />
+      <result column="PIC_SOURCE" property="picSource" jdbcType="INTEGER" />
+      <result column="PIC_ORIURL" property="picOriurl" jdbcType="VARCHAR" />
+      <result column="PIC_SAVEDATE" property="picSavedate" jdbcType="DATE" />
+      <result column="PIC_HASDOWN" property="picHasdown" jdbcType="INTEGER" />
+      <result column="PIC_BLOGUSER" property="picBloguser" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, WEIBO_ID, SCREEN_NAME, PROFILE_URL, VERIFIED_REASON, DESCRIPTION, IMAGE, CONTAINERID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from blog_user
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByContainerid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from blog_user
+    where CONTAINERID = #{containerid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getAllBlogUser" resultMap="BaseResultMap">
+    select a.*,b.ID PIC_ID,b.PIC_NAME,b.PIC_URL,b.PIC_TYPECODE,b.PIC_SOURCE,b.PIC_ORIURL,b.PIC_SAVEDATE,b.PIC_HASDOWN,b.PIC_BLOGUSER from blog_user a,picinstance b
+    where a.CONTAINERID = b.PIC_BLOGUSER
+  </select>
+
+
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from blog_user
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteUserbycontainerid" parameterType="java.lang.String" >
+    delete from blog_user
+    where CONTAINERID = #{containerid,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.example.demo3.test.dao.BlogUser" >
+    insert into blog_user (ID, WEIBO_ID, SCREEN_NAME, 
+      PROFILE_URL, VERIFIED_REASON, DESCRIPTION, 
+      IMAGE, CONTAINERID)
+    values (#{id,jdbcType=INTEGER}, #{weiboId,jdbcType=VARCHAR}, #{screenName,jdbcType=VARCHAR}, 
+      #{profileUrl,jdbcType=VARCHAR}, #{verifiedReason,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{image,jdbcType=VARCHAR}, #{containerid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.demo3.test.dao.BlogUser" >
+    insert into blog_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="weiboId != null" >
+        WEIBO_ID,
+      </if>
+      <if test="screenName != null" >
+        SCREEN_NAME,
+      </if>
+      <if test="profileUrl != null" >
+        PROFILE_URL,
+      </if>
+      <if test="verifiedReason != null" >
+        VERIFIED_REASON,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="image != null" >
+        IMAGE,
+      </if>
+      <if test="containerid != null" >
+        CONTAINERID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="weiboId != null" >
+        #{weiboId,jdbcType=VARCHAR},
+      </if>
+      <if test="screenName != null" >
+        #{screenName,jdbcType=VARCHAR},
+      </if>
+      <if test="profileUrl != null" >
+        #{profileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="verifiedReason != null" >
+        #{verifiedReason,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="image != null" >
+        #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="containerid != null" >
+        #{containerid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.demo3.test.dao.BlogUser" >
+    update blog_user
+    <set >
+      <if test="weiboId != null" >
+        WEIBO_ID = #{weiboId,jdbcType=VARCHAR},
+      </if>
+      <if test="screenName != null" >
+        SCREEN_NAME = #{screenName,jdbcType=VARCHAR},
+      </if>
+      <if test="profileUrl != null" >
+        PROFILE_URL = #{profileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="verifiedReason != null" >
+        VERIFIED_REASON = #{verifiedReason,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="image != null" >
+        IMAGE = #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="containerid != null" >
+        CONTAINERID = #{containerid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.demo3.test.dao.BlogUser" >
+    update blog_user
+    set WEIBO_ID = #{weiboId,jdbcType=VARCHAR},
+      SCREEN_NAME = #{screenName,jdbcType=VARCHAR},
+      PROFILE_URL = #{profileUrl,jdbcType=VARCHAR},
+      VERIFIED_REASON = #{verifiedReason,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      IMAGE = #{image,jdbcType=VARCHAR},
+      CONTAINERID = #{containerid,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

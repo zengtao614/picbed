@@ -19,6 +19,16 @@ public class PicInstance {
 
     private Integer picHasdown;
 
+    private String picBloguser;
+
+    public String getPicBloguser() {
+        return picBloguser;
+    }
+
+    public void setPicBloguser(String picBloguser) {
+        this.picBloguser = picBloguser;
+    }
+
     public Integer getPicHasdown() {
         return picHasdown;
     }

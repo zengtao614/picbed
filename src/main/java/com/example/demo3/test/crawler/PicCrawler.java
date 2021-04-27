@@ -46,9 +46,10 @@ public class PicCrawler {
      * @param sourcecode
      */
     @Async("taskExecutor")
+    @Deprecated
     public void wbspiderRun(String url, String containerid, String typecode, String sourcecode) {
         String content = SpiderUtil.getResponse(url);
-        if (content!=null) {
+        if (content != null) {
             JSONObject jsonObject = JSON.parseObject(content);
             if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
@@ -58,7 +59,7 @@ public class PicCrawler {
                         for (int n = 0; n < picsarray.size(); n++) {
                             String picurl = (String) picsarray.getJSONObject(n).getJSONObject("large").get("url");
                             String picname = picurl.substring(picurl.lastIndexOf("/") + 1);
-                            saveImg(picname, sourcecode, typecode, containerid, picurl);
+                            //saveImg(picname, sourcecode, typecode, containerid, picurl);
                         }
                     }
                 }
@@ -68,6 +69,7 @@ public class PicCrawler {
 
     /**
      * 测试方法
+     *
      * @param url
      * @param containerid
      * @param typecode
@@ -75,16 +77,16 @@ public class PicCrawler {
      * @param page
      */
     @Async("taskExecutor")
-    public void wbspiderRun(String url, String containerid, String typecode, String sourcecode,int page) {
-        System.out.println("线程启动，当前url:"+url);
+    public void wbspiderRun(String url, String containerid, String typecode, String sourcecode, int page) {
+        System.out.println("线程启动，当前url:" + url);
         String content = SpiderUtil.getResponse(url);
-        if (content!=null) {
+        if (content != null) {
             JSONObject jsonObject = JSON.parseObject(content);
             if ("1".equals(String.valueOf(jsonObject.get("ok")))) {
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("cards");
-                redisUtil.setString(containerid+":"+page+"_count",String.valueOf(jsonArray.size()));
+                redisUtil.setString(containerid + ":" + page + "_count", String.valueOf(jsonArray.size()));
                 for (int i = 0; i < jsonArray.size(); i++) {
-                    if (jsonArray.getJSONObject(i).getJSONObject("mblog")!=null) {
+                    if (jsonArray.getJSONObject(i).getJSONObject("mblog") != null) {
                         JSONArray picsarray = jsonArray.getJSONObject(i).getJSONObject("mblog").getJSONArray("pics");
                         if (picsarray != null) {
                             for (int n = 0; n < picsarray.size(); n++) {
@@ -94,17 +96,17 @@ public class PicCrawler {
                             }
                         }
                     }
-                    redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(i+1));
+                    redisUtil.setString(containerid + ":" + page + "_nownum", String.valueOf(i + 1));
                 }
-            }else {
-                redisUtil.setString(containerid+":"+page+"_count",String.valueOf(0));
-                redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(0));
+            } else {
+                redisUtil.setString(containerid + ":" + page + "_count", String.valueOf(0));
+                redisUtil.setString(containerid + ":" + page + "_nownum", String.valueOf(0));
             }
-        }else {
-            redisUtil.setString(containerid+":"+page+"_count",String.valueOf(0));
-            redisUtil.setString(containerid+":"+page+"_nownum",String.valueOf(0));
+        } else {
+            redisUtil.setString(containerid + ":" + page + "_count", String.valueOf(0));
+            redisUtil.setString(containerid + ":" + page + "_nownum", String.valueOf(0));
         }
-        System.out.println("第"+page+"已爬取完毕");
+        System.out.println("第" + page + "已爬取完毕");
         setSpiderProgress(containerid);
 //        redisUtil.setIntAdd(containerid+":allpage");
     }
@@ -131,7 +133,7 @@ public class PicCrawler {
                 }
                 for (String src : srcSet) {
                     String picname = src.substring(src.lastIndexOf("/") + 1) + ".jpg";
-                    saveImg(picname, sourcecode, typecode, boardid, src);
+                    //saveImg(picname, sourcecode, typecode, boardid, src);
                 }
                 thisUrl = SpiderUtil.getNextUrl(html, url);
             }
@@ -142,12 +144,14 @@ public class PicCrawler {
 
     /**
      * 存储图片到数据库和本地
+     *
      * @param picname
      * @param sourcecode
      * @param typecode
      * @param folderid
      * @param picurl
      */
+    @Deprecated
     public void saveImg(String picname, String sourcecode, String typecode, String folderid, String picurl) {
         try {
             if (picInstanceService != null) {
@@ -173,6 +177,7 @@ public class PicCrawler {
 
     /**
      * 模拟存储图片，删去下载操作，节省流量
+     *
      * @param picname
      * @param sourcecode
      * @param typecode
@@ -192,6 +197,7 @@ public class PicCrawler {
                 picInstance.setPicOriurl(picurl);
                 picInstance.setPicSavedate(new Date());
                 picInstance.setPicHasdown(0);
+                picInstance.setPicBloguser(folderid);
                 picInstanceService.insert(picInstance);
             }
         } catch (Exception e) {
@@ -199,8 +205,10 @@ public class PicCrawler {
             System.out.println(picname + "保存失败");
         }
     }
+
     /**
      * 模拟存储图片，删去下载操作，节省流量
+     *
      * @param picname
      * @param sourcecode
      * @param typecode
@@ -220,26 +228,27 @@ public class PicCrawler {
 
     /**
      * 未使用
+     *
      * @return
      */
     public Map shutdownThreadPool() {
         Map map = new HashMap();
-        map.put("总任务数",taskExecutor.getThreadPoolExecutor().getTaskCount());
-        map.put("还剩任务数",taskExecutor.getThreadPoolExecutor().getQueue().size());
-        map.put("完成任务数",taskExecutor.getThreadPoolExecutor().getCompletedTaskCount());
+        map.put("总任务数", taskExecutor.getThreadPoolExecutor().getTaskCount());
+        map.put("还剩任务数", taskExecutor.getThreadPoolExecutor().getQueue().size());
+        map.put("完成任务数", taskExecutor.getThreadPoolExecutor().getCompletedTaskCount());
         return map;
     }
 
-    public synchronized void setSpiderProgress(String containerid){
+    public synchronized void setSpiderProgress(String containerid) {
         int allpage = Integer.valueOf(redisUtil.getString(containerid + ":allpage"));
         int countpage = Integer.valueOf(redisUtil.getString(containerid + ":countpage"));
-        redisUtil.setInt(containerid + ":allpage",allpage+1);
-        if (allpage+1 == countpage){
+        redisUtil.setInt(containerid + ":allpage", allpage + 1);
+        if (allpage + 1 == countpage) {
             //修改此爬虫的状态为0
             picInstanceService.setDeadSpider(containerid);
             //删除该爬虫的redis数据,此处删除会导致前端获取的进度数据不全和获取不到
             //redisUtil.removeStringPattern(containerid+":*");
-            System.out.println("这个爬虫爬完了，爬虫id:"+containerid);
+            System.out.println("这个爬虫爬完了，爬虫id:" + containerid);
         }
     }
 

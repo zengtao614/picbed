@@ -99,10 +99,10 @@ class Demo3ApplicationTests {
     }
 
 
+    @Test
     void redisTest2() {
-        //存值
-        Set<String> keys1 = redisTemplate.keys("*1076033591355593:*");
-        System.out.println(keys1);
+        //key是否存在
+        System.out.println(stringRedisTemplate.hasKey("allnum"));
     }
 
 

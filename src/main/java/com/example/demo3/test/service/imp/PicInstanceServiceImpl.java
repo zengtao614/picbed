@@ -32,6 +32,8 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     @Autowired
     private CrawlerLogMapper crawlerLogMapper;
     @Autowired
+    private BlogUserMapper blogUserMapper;
+    @Autowired
     private PicCrawler picCrawler;
     @Autowired
     private RedisUtil redisUtil;
@@ -132,6 +134,29 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                 /**
                  * ============创建爬虫记录数据==============
                  */
+                /**
+                 * 创建微博用户数据
+                 */
+                JSONObject bloguserjson = pagejson.getJSONObject("data").getJSONArray("cards").getJSONObject(0).getJSONObject("mblog").getJSONObject("user");
+                BlogUser blog_user = blogUserMapper.selectByContainerid(containerid);
+                BlogUser blogUser = new BlogUser();
+                blogUser.setContainerid(containerid);
+                blogUser.setDescription(bloguserjson.getString("description"));
+                blogUser.setImage(bloguserjson.getString("avatar_hd"));
+                blogUser.setProfileUrl(bloguserjson.getString("profile_url"));
+                blogUser.setScreenName(bloguserjson.getString("screen_name"));
+                blogUser.setVerifiedReason(bloguserjson.getString("verified_reason"));
+                blogUser.setWeiboId(bloguserjson.getString("id"));
+                if (blog_user!=null){
+                    blogUser.setId(blog_user.getId());
+                    blogUserMapper.updateByPrimaryKey(blogUser);
+                }else {
+                    blogUserMapper.insert(blogUser);
+                }
+
+                /**
+                 * ============创建微博用户数据==============
+                 */
                 redisUtil.setString(containerid + ":allpage",String.valueOf(0));
                 redisUtil.setString(containerid + ":countpage",String.valueOf(page));
                 for (int i=1;i<=page;i++){
@@ -180,12 +205,26 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public Map getPicdata() {
-        return picInstanceMapper.getPicdata();
+        Map datamap = picInstanceMapper.getPicdata();
+        redisUtil.setInt("allnum", ((Long) datamap.get("allnum")).intValue());
+        redisUtil.setInt("hasdown", ((Long) datamap.get("hasdown")).intValue());
+        /**
+         * 查询redis中图片下载状态，
+         */
+        if (!redisUtil.existsStrkey("downloadStatus")){
+            redisUtil.setInt("downloadStatus", 0);
+            datamap.put("downloadStatus",0);
+        }else {
+            datamap.put("downloadStatus",redisUtil.getString("downloadStatus"));
+        }
+        return datamap;
     }
 
     @Override
-    public void sudodownloadpic() {
+    public Map sudodownloadpic() {
+        Map result = new HashMap();
         System.out.println("手动下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        redisUtil.setInt("downloadStatus", 1);
         List<PicInstance> picList = getNeeddownpic();
         int successDown = 0;
         int failDown = 0;
@@ -195,6 +234,7 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                 p.setPicHasdown(1);
                 updatePicinstance(p);
                 successDown += 1;
+                redisUtil.setInt("hasdown", Integer.parseInt(redisUtil.getString("hasdown")) + 1);
                 System.out.println(p.getPicName() + "下载成功");
             }catch (Exception e){
                 e.printStackTrace();
@@ -202,7 +242,10 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                 System.out.println(p.getPicName() + "下载失败");
             }
         }
-        System.out.println("定时下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+        redisUtil.setInt("downloadStatus", 0);
+        System.out.println("手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+        result.put("msg","手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+        return result;
     }
 
     @Override
@@ -219,8 +262,30 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
         String allpage = (String) spiderProgress.get(containerid+":allpage");
         String countpage = (String) spiderProgress.get(containerid+":countpage");
         if (allpage.equals(countpage)){
+            //redis删除操作
             redisUtil.removeStringPattern(containerid+":*");
         }
         return spiderProgress;
+    }
+
+    @Override
+    public List<BlogUser> getAllBlogUser() {
+        return blogUserMapper.getAllBlogUser();
+    }
+
+    @Override
+    public Map getPicdataInredis() {
+        Map datamap = new HashMap();
+        datamap.put("allnum", Integer.parseInt(redisUtil.getString("allnum")));
+        datamap.put("hasdown", Integer.parseInt(redisUtil.getString("hasdown")));
+        return datamap;
+    }
+
+    @Override
+    public void deletepicForbloguser(String containerid) {
+        //删除数据库图片数据
+        picInstanceMapper.deletePicbycontainerid(containerid);
+        //删除博主用户数据
+        blogUserMapper.deleteUserbycontainerid(containerid);
     }
 }

@@ -28,4 +28,6 @@ public interface PicInstanceMapper {
     List<PicInstance> getNeeddownpicTest();
 
     Map getPicdata();
+
+    void deletePicbycontainerid(String containerid);
 }

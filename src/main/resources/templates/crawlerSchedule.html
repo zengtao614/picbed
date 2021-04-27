@@ -50,6 +50,10 @@
         .page .content .piccell .procells.remove {
             display: none;
         }
+
+        .progress {
+            margin: 0 10px 0 10px;
+        }
     </style>
 </head>
 <body>
@@ -112,6 +116,7 @@
                                             $("." + [[${crawler.craParam}]] + "page" + i).width(pro * 100 + "%");
                                             $("." + [[${crawler.craParam}]] + "page" + i).text("总数:" + result[cont + i + "_count"] + ";当前:" + result[cont + i + "_nownum"]);
                                         }
+                                        //判断此爬虫是否爬取完毕，停掉定时器不再向后台发出进度获取请求
                                         if (allpro == 1) {
                                             window.clearInterval(timingTask)
                                         }
