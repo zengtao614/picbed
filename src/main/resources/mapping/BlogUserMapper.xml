@@ -41,7 +41,7 @@
   </select>
 
   <select id="getAllBlogUser" resultMap="BaseResultMap">
-    select a.*,b.ID PIC_ID,b.PIC_NAME,b.PIC_URL,b.PIC_TYPECODE,b.PIC_SOURCE,b.PIC_ORIURL,b.PIC_SAVEDATE,b.PIC_HASDOWN,b.PIC_BLOGUSER from blog_user a,picinstance b
+    select a.*,b.ID PIC_ID,b.PIC_NAME,b.PIC_URL,b.PIC_TYPECODE,b.PIC_SOURCE,b.PIC_ORIURL,b.PIC_SAVEDATE,b.PIC_HASDOWN,b.PIC_BLOGUSER from blog_user a,PICINSTANCE b
     where a.CONTAINERID = b.PIC_BLOGUSER
   </select>
 
