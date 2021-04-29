@@ -33,18 +33,22 @@ public class TaskPoolConfig {
         return taskExecutor;
     }
 
-/*    @Bean("downloadTaskExecutor")
+    /**
+     * 下载线程，同时只允许3个子线程进行工作
+     * @return
+     */
+    @Bean("downloadTaskExecutor")
     public ThreadPoolTaskExecutor downloadTaskExecutor(){
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(10);
-        taskExecutor.setMaxPoolSize(20);
-        taskExecutor.setQueueCapacity(1000);
-        taskExecutor.setKeepAliveSeconds(60);
+        taskExecutor.setCorePoolSize(3);
+        taskExecutor.setMaxPoolSize(5);
+        taskExecutor.setQueueCapacity(20);
+        taskExecutor.setKeepAliveSeconds(30);
         taskExecutor.setThreadNamePrefix("downloadTaskExecutor--");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-        taskExecutor.setAwaitTerminationSeconds(60);
+        taskExecutor.setAwaitTerminationSeconds(30);
         return taskExecutor;
-    }*/
+    }
 
 
 }

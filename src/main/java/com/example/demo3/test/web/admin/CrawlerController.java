@@ -93,6 +93,13 @@ public class CrawlerController {
         return result;
     }
 
+    @RequestMapping("/getBloguserProgress")
+    @ResponseBody
+    public Map getBloguserProgress(@RequestParam String containerid){
+        Map result = picInstanceService.getBloguserpicdataInredis(containerid);
+        return result;
+    }
+
     @RequestMapping("/shutdownthread")
     @ResponseBody
     public Map  shutdownthread(){
@@ -118,6 +125,15 @@ public class CrawlerController {
         picInstanceService.deletepicForbloguser(containerid);
         return "删除成功!";
     }
+
+    @RequestMapping("/downloadpicForbloguser")
+    @ResponseBody
+    public String  downloadpicForbloguser(@RequestParam String containerid){
+        picInstanceService.downloadpicForbloguser(containerid);
+        return "删除成功!";
+    }
+
+
 
     @RequestMapping("/sudodownloadpic")
     @ResponseBody

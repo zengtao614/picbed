@@ -30,4 +30,8 @@ public interface PicInstanceMapper {
     Map getPicdata();
 
     void deletePicbycontainerid(String containerid);
+
+    List<PicInstance> getNeeddownpicForbloguser(String containerid);
+
+    Map<String, Long> getPicdataForbloguser(String containerid);
 }

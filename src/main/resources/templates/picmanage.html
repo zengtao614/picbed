@@ -206,8 +206,8 @@
                     0%
                 </div>
             </div>
-            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==1" disabled="disabled" class="sudoBt">立即下载图片</button>
-            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==0" class="sudoBt">立即下载图片</button>
+<!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==1" disabled="disabled" class="sudoBt">立即下载图片</button>-->
+<!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==0" class="sudoBt">立即下载图片</button>-->
         </div>
         <!--下载状态提示-->
         <div class="download_tip">
@@ -235,8 +235,44 @@
                         </div>
                         <span class="info_name" th:text="${bloguser.screenName}"></span>
                     </div>
-                    <span class="bloguser_pics_info" th:text="此博主下一共有+${bloguser.picInstances.size()}+张图片"></span>
+                    <span class="bloguser_pics_info" th:text="此博主下一共有+${bloguser.picInstances.size()}+张图片，已下载的有+${bloguser.picData.hasdown}+张图片"></span>
+                    <div class="progress progress-striped active remove" style="flex: 1">
+                        <div class="progress-bar progress-bar-success" th:classappend="${bloguser.containerid}"
+                             role="progressbar"
+                             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                             style="width: 0%;">
+                            0%
+                        </div>
+                    </div>
+                    <script>
+                        $(function (){
+                            var rate = Math.round([[${bloguser.picData.hasdown}]]*100/[[${bloguser.picData.allnum}]])
+                            $(".progress-bar."+[[${bloguser.containerid}]]).width(rate  + "%");
+                            $(".progress-bar."+[[${bloguser.containerid}]]).text(rate  + "%");
+                            if ([[${bloguser.picData.downloadStatus}]] == 1){
+                                //$(".download_tip_text").text("下载中").css("color","red")
+                                var timingmainTask = setInterval(function () {
+                                    $.ajax({
+                                        type: 'get',
+                                        url: "./getBloguserProgress?containerid=" + [[${bloguser.containerid}]],
+                                        dataType: 'json',
+                                        success: function (result) {
+                                            var rate = Math.round(result["hasdown"] * 100/result["allnum"])
+                                            $(".progress-bar."+[[${bloguser.containerid}]]).width(rate  + "%");
+                                            $(".progress-bar."+[[${bloguser.containerid}]]).text(rate  + "%");
+                                            if (result["hasdown"] == result["allnum"]){
+                                                window.clearInterval(timingmainTask)
+                                                /*$(".sudoBt").removeAttr("disabled")
+                                                $(".download_tip_text").text("下载完成").css("color","green")*/
+                                            }
+                                        }
+                                    });
+                                }, 1000)
+                            }
+                        })
+                    </script>
                     <div class="bloguser_cot">
+                        <button class="downloadbut" th:value="${bloguser.containerid}">立即下载</button>
                         <button class="procebut" th:value="${bloguser.containerid}">展开关闭</button>
                         <button class="deletebut" th:value="${bloguser.containerid}">删除</button>
                     </div>
@@ -346,6 +382,35 @@
                 }
             });
         }
+    })
+
+    $(".downloadbut").click(function (){
+        var cls = $(this).attr("value")
+        if(confirm("是否下载此博主下所有未下载图片")){
+            $.ajax({
+                type: 'get',
+                url: "./downloadpicForbloguser?containerid=" + cls ,
+                success: function (result) {
+
+                }
+            });
+        }
+        var timingmainTask = setInterval(function () {
+            $.ajax({
+                type: 'get',
+                url: "./getBloguserProgress?containerid=" + cls,
+                dataType: 'json',
+                success: function (result) {
+                    var rate = Math.round(result["hasdown"] * 100/result["allnum"])
+                    $(".progress-bar."+cls).width(rate  + "%");
+                    $(".progress-bar."+cls).text(rate  + "%");
+                    if (result["hasdown"] == result["allnum"]){
+                        window.clearInterval(timingmainTask)
+                    }
+                }
+            });
+        }, 1000)
+
     })
 
     $(".pic_name").hover(function (){

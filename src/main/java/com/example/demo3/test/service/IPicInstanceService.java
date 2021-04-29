@@ -82,6 +82,12 @@ public interface IPicInstanceService {
     List<PicInstance> getNeeddownpic();
 
     /**
+     * 获取对应博主下未下载的图片实例
+     * @return
+     */
+    List<PicInstance> getNeeddownpicForbloguser(String containerid);
+
+    /**
      * 获取未下载的图片实例（测试方法，每次只获取20实例）
      * @return
      */
@@ -136,4 +142,24 @@ public interface IPicInstanceService {
      * @return
      */
     void deletepicForbloguser(String containerid);
+
+    /**
+     * 下载某个博主下所有图片
+     * @param containerid
+     */
+    void downloadpicForbloguser(String containerid);
+
+    /**
+     * 获取某个博主下所有图片数据（全部数量，已下载未下载数量）
+     * @param containerid
+     * @return
+     */
+    Map<String, Long> getPicdataForbloguser(String containerid);
+
+    /**
+     * 获取某个博主的数据库图片基本数据从redis中查询
+     * @param containerid
+     * @return
+     */
+    Map getBloguserpicdataInredis(String containerid);
 }

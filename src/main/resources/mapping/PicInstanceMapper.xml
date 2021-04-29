@@ -51,15 +51,27 @@
     where PIC_HASDOWN = 0
   </select>
 
+  <select id="getNeeddownpicForbloguser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from PICINSTANCE
+    where PIC_HASDOWN = 0 and PIC_BLOGUSER = #{containerid,jdbcType=VARCHAR}
+  </select>
+
   <select id="getPicdata" resultType="java.util.Map">
     select count(PIC_HASDOWN=0 or null) nodown,count(PIC_HASDOWN=1 or null) hasdown, count(*) allnum from PICINSTANCE
+  </select>
+
+  <select id="getPicdataForbloguser" resultType="java.util.Map">
+    select count(PIC_HASDOWN=0 or null) nodown,count(PIC_HASDOWN=1 or null) hasdown, count(*) allnum from PICINSTANCE
+    where PIC_BLOGUSER = #{containerid,jdbcType=VARCHAR}
   </select>
 
   <select id="getNeeddownpicTest" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from PICINSTANCE
-    where PIC_HASDOWN = 0 limit 20
+    where PIC_HASDOWN = 0 limit 1000
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >

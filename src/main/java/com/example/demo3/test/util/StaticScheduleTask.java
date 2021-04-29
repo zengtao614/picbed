@@ -30,10 +30,8 @@ public class StaticScheduleTask {
     private RedisUtil redisUtil;
 
     /**
-     * 定时下载未下载的图片
+     * 定时下载未下载的图片每晚下载1000条
      */
-    //@Scheduled(cron = "0/5 * * * * ?")
-    //或直接指定时间间隔，例如：5秒
     @Scheduled(cron = "0 0 0 ? * 2-7")//除了每周周日外每天晚上12点自动执行图片下载方法
     private void downloadPic() {
         System.out.println("定时下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

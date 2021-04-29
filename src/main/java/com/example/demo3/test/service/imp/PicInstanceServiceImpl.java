@@ -11,6 +11,7 @@ import com.example.demo3.test.util.SpringSecurityUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -194,6 +195,11 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     }
 
     @Override
+    public List<PicInstance> getNeeddownpicForbloguser(String containerid) {
+        return picInstanceMapper.getNeeddownpicForbloguser(containerid);
+    }
+
+    @Override
     public List<PicInstance> getNeeddownpicTest() {
         return picInstanceMapper.getNeeddownpicTest();
     }
@@ -270,7 +276,39 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public List<BlogUser> getAllBlogUser() {
-        return blogUserMapper.getAllBlogUser();
+        List<BlogUser> blogUsers =  blogUserMapper.getAllBlogUser();
+        for (BlogUser user:blogUsers){
+            Map<String, Long> picResult = getPicdataForbloguser(user.getContainerid());
+            Map<String, Integer> picData = user.getPicData();
+            picData.put("allnum",picResult.get("allnum").intValue());
+            picData.put("hasdown",picResult.get("hasdown").intValue());
+            picData.put("nodown",picResult.get("nodown").intValue());
+            /**
+             * 查询redis中图片下载状态，
+             */
+            if (!redisUtil.existsStrkey(user.getContainerid()+"download:downloadStatus")){
+                redisUtil.setInt(user.getContainerid()+"download:downloadStatus", 0);
+                picData.put("downloadStatus",0);
+            }else {
+                picData.put("downloadStatus",Integer.valueOf(redisUtil.getString(user.getContainerid()+"download:downloadStatus")));
+            }
+            redisUtil.setInt(user.getContainerid()+"download:allnum", picResult.get("allnum").intValue());
+            redisUtil.setInt(user.getContainerid()+"download:hasdown", picResult.get("hasdown").intValue());
+        }
+        return blogUsers;
+    }
+
+    @Override
+    public Map<String, Long> getPicdataForbloguser(String containerid) {
+        return picInstanceMapper.getPicdataForbloguser(containerid);
+    }
+
+    @Override
+    public Map getBloguserpicdataInredis(String containerid) {
+        Map datamap = new HashMap();
+        datamap.put("allnum", Integer.parseInt(redisUtil.getString(containerid+"download:allnum")));
+        datamap.put("hasdown", Integer.parseInt(redisUtil.getString(containerid+"download:hasdown")));
+        return datamap;
     }
 
     @Override
@@ -287,5 +325,37 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
         picInstanceMapper.deletePicbycontainerid(containerid);
         //删除博主用户数据
         blogUserMapper.deleteUserbycontainerid(containerid);
+        //删除redis数据
+        redisUtil.removeStringPattern(containerid+"download:*");
     }
+
+    @Async("downloadTaskExecutor")
+    @Override
+    public void downloadpicForbloguser(String containerid) {
+        System.out.println(containerid + "=========手动下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        List<PicInstance> picList = getNeeddownpicForbloguser(containerid);
+        int successDown = 0;
+        int failDown = 0;
+        redisUtil.setInt(containerid+"download:downloadStatus", 1);
+        //redisUtil.setInt(containerid+"download:allnum", picList.size());
+        for (PicInstance p:picList){
+            try {
+                //SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
+                p.setPicHasdown(1);
+                updatePicinstance(p);
+                successDown += 1;
+                redisUtil.setInt(containerid+"download:hasdown", Integer.parseInt(redisUtil.getString(containerid+"download:hasdown")) + 1);
+                Thread.sleep(500);
+                System.out.println(p.getPicName() + "下载成功");
+            }catch (Exception e){
+                e.printStackTrace();
+                failDown += 1;
+                System.out.println(p.getPicName() + "下载失败");
+            }
+        }
+        redisUtil.setInt(containerid+"download:downloadStatus", 0);
+        System.out.println(containerid + "=========手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+    }
+
+
 }

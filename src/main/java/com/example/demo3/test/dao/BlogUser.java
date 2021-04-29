@@ -1,6 +1,8 @@
 package com.example.demo3.test.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BlogUser {
     private Integer id;
@@ -20,6 +22,12 @@ public class BlogUser {
     private String containerid;
 
     private List<PicInstance> picInstances;
+
+    private Map<String,Integer> picData = new HashMap<>();
+
+    public Map<String, Integer> getPicData() {
+        return picData;
+    }
 
     public List<PicInstance> getPicInstances() {
         return picInstances;
