@@ -5,6 +5,7 @@ import com.example.demo3.test.dao.CrawlerLog;
 import com.example.demo3.test.dao.PicInstance;
 import com.github.pagehelper.PageInfo;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -162,4 +163,11 @@ public interface IPicInstanceService {
      * @return
      */
     Map getBloguserpicdataInredis(String containerid);
+
+    /**
+     * 打包博主下的图片下载到本地
+     * @param containerid
+     * @param response
+     */
+    void packagedownpicForbloguser(String containerid, HttpServletResponse response);
 }

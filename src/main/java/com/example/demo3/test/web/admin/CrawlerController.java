@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,10 +131,14 @@ public class CrawlerController {
     @ResponseBody
     public String  downloadpicForbloguser(@RequestParam String containerid){
         picInstanceService.downloadpicForbloguser(containerid);
-        return "删除成功!";
+        return "下载成功!";
     }
 
-
+    @RequestMapping("/packagedownpicForbloguser")
+    public void  packagedownpicForbloguser(@RequestParam String containerid, HttpServletResponse response){
+        picInstanceService.packagedownpicForbloguser(containerid,response);
+        //return "下载成功!";
+    }
 
     @RequestMapping("/sudodownloadpic")
     @ResponseBody

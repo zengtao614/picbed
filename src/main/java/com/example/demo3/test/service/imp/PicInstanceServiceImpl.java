@@ -13,14 +13,19 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author zt
@@ -41,7 +46,7 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public PageInfo<PicInstance> getAllPic(int pagenum, int pagesize, Map params) {
-        PageHelper.startPage(pagenum,pagesize);
+        PageHelper.startPage(pagenum, pagesize);
         List<PicInstance> picInstanceList = picInstanceMapper.getAllPic(params);
         PageInfo<PicInstance> pageInfo = new PageInfo<>(picInstanceList);
         return pageInfo;
@@ -54,13 +59,13 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
 
     @Override
     public void grabHbByid(String boardid, String typecode, String sourcecode) {
-        picCrawler.hbspiderRun(boardid,typecode,sourcecode);
+        picCrawler.hbspiderRun(boardid, typecode, sourcecode);
     }
 
     @Override
     public void grabHbByspan(String spanname, String typecode, String sourcecode) {
         try {
-            StringBuffer html = SpiderUtil.getHtml(SpiderUtil.HUABAN_SPANSITE+spanname);
+            StringBuffer html = SpiderUtil.getHtml(SpiderUtil.HUABAN_SPANSITE + spanname);
             Matcher matcherSu = Pattern.compile(SpiderUtil.boardsRegex).matcher(html);
             while (matcherSu.find()) {
                 LinkedHashSet<String> idSet = new LinkedHashSet<>();
@@ -76,11 +81,11 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                         }
                     }
                 }
-                for (String boardid:idSet){
-                    picCrawler.hbspiderRun(boardid,typecode,sourcecode);
+                for (String boardid : idSet) {
+                    picCrawler.hbspiderRun(boardid, typecode, sourcecode);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -92,13 +97,13 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
             SpiderUtil.createFolder(SpiderUtil.folder_name + containerid + "/");
             String url = SpiderUtil.weibo_baseurl + containerid;
             JSONObject pagejson = JSON.parseObject(SpiderUtil.getResponse(url));
-            if("1".equals(String.valueOf(pagejson.get("ok")))){
-                int total = (Integer)(pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
-                int page = (total/10) + 1;
-                for (int i=0;i<=page;i++){
-                    picCrawler.wbspiderRun(url,containerid,typecode,sourcecode);
+            if ("1".equals(String.valueOf(pagejson.get("ok")))) {
+                int total = (Integer) (pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
+                int page = (total / 10) + 1;
+                for (int i = 0; i <= page; i++) {
+                    picCrawler.wbspiderRun(url, containerid, typecode, sourcecode);
                 }
-            }else{
+            } else {
                 System.out.println("此用户下无微博！");
             }
         } catch (Exception e) {
@@ -114,9 +119,9 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
             SpiderUtil.createFolder(SpiderUtil.folder_name + containerid + "/");
             String url = SpiderUtil.weibo_baseurl + containerid;
             JSONObject pagejson = JSON.parseObject(SpiderUtil.getResponse(url));
-            if("1".equals(String.valueOf(pagejson.get("ok")))){
-                int total = (Integer)(pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
-                int page = (total/10) + 1;
+            if ("1".equals(String.valueOf(pagejson.get("ok")))) {
+                int total = (Integer) (pagejson.getJSONObject("data").getJSONObject("cardlistInfo").get("total"));
+                int page = (total / 10) + 1;
                 /**
                  * 创建爬虫记录数据
                  */
@@ -148,24 +153,24 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
                 blogUser.setScreenName(bloguserjson.getString("screen_name"));
                 blogUser.setVerifiedReason(bloguserjson.getString("verified_reason"));
                 blogUser.setWeiboId(bloguserjson.getString("id"));
-                if (blog_user!=null){
+                if (blog_user != null) {
                     blogUser.setId(blog_user.getId());
                     blogUserMapper.updateByPrimaryKey(blogUser);
-                }else {
+                } else {
                     blogUserMapper.insert(blogUser);
                 }
 
                 /**
                  * ============创建微博用户数据==============
                  */
-                redisUtil.setString(containerid + ":allpage",String.valueOf(0));
-                redisUtil.setString(containerid + ":countpage",String.valueOf(page));
-                for (int i=1;i<=page;i++){
+                redisUtil.setString(containerid + ":allpage", String.valueOf(0));
+                redisUtil.setString(containerid + ":countpage", String.valueOf(page));
+                for (int i = 1; i <= page; i++) {
                     String pageurl = url + "&page=" + i;
-                    picCrawler.wbspiderRun(pageurl,containerid,typecode,sourcecode,i);
+                    picCrawler.wbspiderRun(pageurl, containerid, typecode, sourcecode, i);
                 }
                 return page;
-            }else{
+            } else {
                 System.out.println("此用户下无微博！");
             }
         } catch (Exception e) {
@@ -217,11 +222,11 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
         /**
          * 查询redis中图片下载状态，
          */
-        if (!redisUtil.existsStrkey("downloadStatus")){
+        if (!redisUtil.existsStrkey("downloadStatus")) {
             redisUtil.setInt("downloadStatus", 0);
-            datamap.put("downloadStatus",0);
-        }else {
-            datamap.put("downloadStatus",redisUtil.getString("downloadStatus"));
+            datamap.put("downloadStatus", 0);
+        } else {
+            datamap.put("downloadStatus", redisUtil.getString("downloadStatus"));
         }
         return datamap;
     }
@@ -229,28 +234,28 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     @Override
     public Map sudodownloadpic() {
         Map result = new HashMap();
-        System.out.println("手动下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        System.out.println("手动下载图片任务开始，当前时间为:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         redisUtil.setInt("downloadStatus", 1);
         List<PicInstance> picList = getNeeddownpic();
         int successDown = 0;
         int failDown = 0;
-        for (PicInstance p:picList){
+        for (PicInstance p : picList) {
             try {
-                SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
+                SpiderUtil.downloadpic(p.getPicOriurl(), SpiderUtil.folder_name + p.getPicUrl());
                 p.setPicHasdown(1);
                 updatePicinstance(p);
                 successDown += 1;
                 redisUtil.setInt("hasdown", Integer.parseInt(redisUtil.getString("hasdown")) + 1);
                 System.out.println(p.getPicName() + "下载成功");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 failDown += 1;
                 System.out.println(p.getPicName() + "下载失败");
             }
         }
         redisUtil.setInt("downloadStatus", 0);
-        System.out.println("手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
-        result.put("msg","手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+        System.out.println("手动下载图片任务结束,当前时间为:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ";下载成功" + successDown + "张，下载失败" + failDown + "张。");
+        result.put("msg", "手动下载图片任务结束,当前时间为:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ";下载成功" + successDown + "张，下载失败" + failDown + "张。");
         return result;
     }
 
@@ -265,35 +270,35 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
         /**
          * 判断进度数是否等于总数，如果等于则判断此爬虫爬取完毕，删掉redis中对应的所有数据。
          */
-        String allpage = (String) spiderProgress.get(containerid+":allpage");
-        String countpage = (String) spiderProgress.get(containerid+":countpage");
-        if (allpage.equals(countpage)){
+        String allpage = (String) spiderProgress.get(containerid + ":allpage");
+        String countpage = (String) spiderProgress.get(containerid + ":countpage");
+        if (allpage.equals(countpage)) {
             //redis删除操作
-            redisUtil.removeStringPattern(containerid+":*");
+            redisUtil.removeStringPattern(containerid + ":*");
         }
         return spiderProgress;
     }
 
     @Override
     public List<BlogUser> getAllBlogUser() {
-        List<BlogUser> blogUsers =  blogUserMapper.getAllBlogUser();
-        for (BlogUser user:blogUsers){
+        List<BlogUser> blogUsers = blogUserMapper.getAllBlogUser();
+        for (BlogUser user : blogUsers) {
             Map<String, Long> picResult = getPicdataForbloguser(user.getContainerid());
             Map<String, Integer> picData = user.getPicData();
-            picData.put("allnum",picResult.get("allnum").intValue());
-            picData.put("hasdown",picResult.get("hasdown").intValue());
-            picData.put("nodown",picResult.get("nodown").intValue());
+            picData.put("allnum", picResult.get("allnum").intValue());
+            picData.put("hasdown", picResult.get("hasdown").intValue());
+            picData.put("nodown", picResult.get("nodown").intValue());
             /**
              * 查询redis中图片下载状态，
              */
-            if (!redisUtil.existsStrkey(user.getContainerid()+"download:downloadStatus")){
-                redisUtil.setInt(user.getContainerid()+"download:downloadStatus", 0);
-                picData.put("downloadStatus",0);
-            }else {
-                picData.put("downloadStatus",Integer.valueOf(redisUtil.getString(user.getContainerid()+"download:downloadStatus")));
+            if (!redisUtil.existsStrkey(user.getContainerid() + "download:downloadStatus")) {
+                redisUtil.setInt(user.getContainerid() + "download:downloadStatus", 0);
+                picData.put("downloadStatus", 0);
+            } else {
+                picData.put("downloadStatus", Integer.valueOf(redisUtil.getString(user.getContainerid() + "download:downloadStatus")));
             }
-            redisUtil.setInt(user.getContainerid()+"download:allnum", picResult.get("allnum").intValue());
-            redisUtil.setInt(user.getContainerid()+"download:hasdown", picResult.get("hasdown").intValue());
+            redisUtil.setInt(user.getContainerid() + "download:allnum", picResult.get("allnum").intValue());
+            redisUtil.setInt(user.getContainerid() + "download:hasdown", picResult.get("hasdown").intValue());
         }
         return blogUsers;
     }
@@ -306,9 +311,80 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
     @Override
     public Map getBloguserpicdataInredis(String containerid) {
         Map datamap = new HashMap();
-        datamap.put("allnum", Integer.parseInt(redisUtil.getString(containerid+"download:allnum")));
-        datamap.put("hasdown", Integer.parseInt(redisUtil.getString(containerid+"download:hasdown")));
+        datamap.put("allnum", Integer.parseInt(redisUtil.getString(containerid + "download:allnum")));
+        datamap.put("hasdown", Integer.parseInt(redisUtil.getString(containerid + "download:hasdown")));
         return datamap;
+    }
+
+    @Override
+    public void packagedownpicForbloguser(String containerid, HttpServletResponse response) {
+        File parentfile = new File(SpiderUtil.folder_name + containerid);
+        if (parentfile.exists()) {
+            FileOutputStream fos = null;
+            ZipOutputStream zos = null;
+            FileInputStream fis = null;
+            OutputStream os = null;
+            try {
+                File[] files = parentfile.listFiles();
+                fos = new FileOutputStream(SpiderUtil.folder_name + containerid + ".zip");
+                zos = new ZipOutputStream(fos);
+                for (File f : files) {
+                    ZipEntry zipEntry = new ZipEntry(f.getName());
+                    zos.putNextEntry(zipEntry);
+                    fis = new FileInputStream(f);
+                    byte[] bufs = new byte[10240];
+                    int len = 0;
+                    while ((len = fis.read(bufs)) != -1) {
+                        zos.write(bufs, 0, len);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                try {
+                    if (fis!=null){
+                        fis.close();
+                    }
+                    if (zos!=null){
+                        zos.close();
+                    }
+                    if (fos!=null){
+                        fos.close();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            File zipFile = new File(SpiderUtil.folder_name + containerid + ".zip");
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("multipart/form-data");
+            response.setHeader("Content-Disposition", "attachment;fileName="+ zipFile.getName());
+            try {
+                os = response.getOutputStream();
+                fis = new FileInputStream(zipFile);
+                byte[] bufs = new byte[10240];
+                int len = 0;
+                while ((len = fis.read(bufs))!=-1){
+                    os.write(bufs,0,len);
+                }
+                fis.close();
+                os.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                try {
+                    if (fis!=null){
+                        fis.close();
+                    }
+                    if (os!=null){
+                        os.close();
+                    }
+                    zipFile.delete();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -326,35 +402,35 @@ public class PicInstanceServiceImpl implements IPicInstanceService {
         //删除博主用户数据
         blogUserMapper.deleteUserbycontainerid(containerid);
         //删除redis数据
-        redisUtil.removeStringPattern(containerid+"download:*");
+        redisUtil.removeStringPattern(containerid + "download:*");
     }
 
     @Async("downloadTaskExecutor")
     @Override
     public void downloadpicForbloguser(String containerid) {
-        System.out.println(containerid + "=========手动下载图片任务开始，当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        System.out.println(containerid + "=========手动下载图片任务开始，当前时间为:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         List<PicInstance> picList = getNeeddownpicForbloguser(containerid);
         int successDown = 0;
         int failDown = 0;
-        redisUtil.setInt(containerid+"download:downloadStatus", 1);
+        redisUtil.setInt(containerid + "download:downloadStatus", 1);
         //redisUtil.setInt(containerid+"download:allnum", picList.size());
-        for (PicInstance p:picList){
+        for (PicInstance p : picList) {
             try {
-                //SpiderUtil.downloadpic(p.getPicOriurl(),SpiderUtil.folder_name + p.getPicUrl());
+                SpiderUtil.downloadpic(p.getPicOriurl(), SpiderUtil.folder_name + p.getPicUrl());
                 p.setPicHasdown(1);
                 updatePicinstance(p);
                 successDown += 1;
-                redisUtil.setInt(containerid+"download:hasdown", Integer.parseInt(redisUtil.getString(containerid+"download:hasdown")) + 1);
+                redisUtil.setInt(containerid + "download:hasdown", Integer.parseInt(redisUtil.getString(containerid + "download:hasdown")) + 1);
                 Thread.sleep(500);
                 System.out.println(p.getPicName() + "下载成功");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 failDown += 1;
                 System.out.println(p.getPicName() + "下载失败");
             }
         }
-        redisUtil.setInt(containerid+"download:downloadStatus", 0);
-        System.out.println(containerid + "=========手动下载图片任务结束,当前时间为:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+";下载成功"+successDown+"张，下载失败"+failDown+"张。");
+        redisUtil.setInt(containerid + "download:downloadStatus", 0);
+        System.out.println(containerid + "=========手动下载图片任务结束,当前时间为:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ";下载成功" + successDown + "张，下载失败" + failDown + "张。");
     }
 
 

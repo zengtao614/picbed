@@ -32,7 +32,8 @@
             align-items: center;
             justify-content: space-between;
         }
-        .page .content .download_tip{
+
+        .page .content .download_tip {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -78,7 +79,8 @@
             justify-content: space-between;
             position: relative;
         }
-        .page .content .allpic .bloguser_pics .pic_info .pic_img{
+
+        .page .content .allpic .bloguser_pics .pic_info .pic_img {
             display: none;
             position: absolute;
             left: 1%;
@@ -87,7 +89,7 @@
             z-index: 99;
         }
 
-        .page .content .allpic .bloguser_pics .pic_info .pic_name:hover + .pic_img{
+        .page .content .allpic .bloguser_pics .pic_info .pic_name:hover + .pic_img {
             display: block;
         }
 
@@ -163,7 +165,8 @@
         .progress.remove {
             /*display: none;*/
         }
-        #loading{
+
+        #loading {
             opacity: 0.8;
             display: none;
             position: absolute;
@@ -172,7 +175,8 @@
             justify-content: center;
             align-items: center;
         }
-        #loading .loading_tip{
+
+        #loading .loading_tip {
             width: 30%;
             background-color: white;
             height: 20%;
@@ -206,8 +210,8 @@
                     0%
                 </div>
             </div>
-<!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==1" disabled="disabled" class="sudoBt">立即下载图片</button>-->
-<!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==0" class="sudoBt">立即下载图片</button>-->
+            <!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==1" disabled="disabled" class="sudoBt">立即下载图片</button>-->
+            <!--            <button onclick="sudopic()" th:if="${picdata.downloadStatus} ==0" class="sudoBt">立即下载图片</button>-->
         </div>
         <!--下载状态提示-->
         <div class="download_tip">
@@ -235,7 +239,8 @@
                         </div>
                         <span class="info_name" th:text="${bloguser.screenName}"></span>
                     </div>
-                    <span class="bloguser_pics_info" th:text="此博主下一共有+${bloguser.picInstances.size()}+张图片，已下载的有+${bloguser.picData.hasdown}+张图片"></span>
+                    <span class="bloguser_pics_info"
+                          th:text="此博主下一共有+${bloguser.picInstances.size()}+张图片，已下载的有+${bloguser.picData.hasdown}+张图片"></span>
                     <div class="progress progress-striped active remove" style="flex: 1">
                         <div class="progress-bar progress-bar-success" th:classappend="${bloguser.containerid}"
                              role="progressbar"
@@ -245,11 +250,11 @@
                         </div>
                     </div>
                     <script>
-                        $(function (){
-                            var rate = Math.round([[${bloguser.picData.hasdown}]]*100/[[${bloguser.picData.allnum}]])
-                            $(".progress-bar."+[[${bloguser.containerid}]]).width(rate  + "%");
-                            $(".progress-bar."+[[${bloguser.containerid}]]).text(rate  + "%");
-                            if ([[${bloguser.picData.downloadStatus}]] == 1){
+                        $(function () {
+                            var rate = Math.round([[${bloguser.picData.hasdown}]] * 100 / [[${bloguser.picData.allnum}]])
+                            $(".progress-bar." + [[${bloguser.containerid}]]).width(rate + "%");
+                            $(".progress-bar." + [[${bloguser.containerid}]]).text(rate + "%");
+                            if ([[${bloguser.picData.downloadStatus}]] == 1) {
                                 //$(".download_tip_text").text("下载中").css("color","red")
                                 var timingmainTask = setInterval(function () {
                                     $.ajax({
@@ -257,10 +262,10 @@
                                         url: "./getBloguserProgress?containerid=" + [[${bloguser.containerid}]],
                                         dataType: 'json',
                                         success: function (result) {
-                                            var rate = Math.round(result["hasdown"] * 100/result["allnum"])
-                                            $(".progress-bar."+[[${bloguser.containerid}]]).width(rate  + "%");
-                                            $(".progress-bar."+[[${bloguser.containerid}]]).text(rate  + "%");
-                                            if (result["hasdown"] == result["allnum"]){
+                                            var rate = Math.round(result["hasdown"] * 100 / result["allnum"])
+                                            $(".progress-bar." + [[${bloguser.containerid}]]).width(rate + "%");
+                                            $(".progress-bar." + [[${bloguser.containerid}]]).text(rate + "%");
+                                            if (result["hasdown"] == result["allnum"]) {
                                                 window.clearInterval(timingmainTask)
                                                 /*$(".sudoBt").removeAttr("disabled")
                                                 $(".download_tip_text").text("下载完成").css("color","green")*/
@@ -272,6 +277,7 @@
                         })
                     </script>
                     <div class="bloguser_cot">
+                        <button class="packagedown" th:value="${bloguser.containerid}">打包本地下载</button>
                         <button class="downloadbut" th:value="${bloguser.containerid}">立即下载</button>
                         <button class="procebut" th:value="${bloguser.containerid}">展开关闭</button>
                         <button class="deletebut" th:value="${bloguser.containerid}">删除</button>
@@ -280,10 +286,12 @@
                 <!--博主下所有图片列表-->
                 <div class="bloguser_pics remove" th:classappend="${bloguser.containerid}">
                     <div th:each="pic:${bloguser.picInstances}" class="pic_info">
-                        <a th:text="${pic.picName}" th:if="${pic.picHasdown==1}" th:href="${nginxsite}+${pic.picUrl}" class="pic_name" target="_blank"></a>
-                        <a th:text="${pic.picName}" th:if="${pic.picHasdown==0}" th:href="${pic.picOriurl}" class="pic_name" target="_blank"></a>
-<!--                        <img th:if="${pic.picHasdown==1}" th:src="${nginxsite}+${pic.picUrl}" class="pic_img"/>-->
-<!--                        <img th:if="${pic.picHasdown==0}" th:src="${pic.picOriurl}" class="pic_img"/>-->
+                        <a th:text="${pic.picName}" th:if="${pic.picHasdown==1}" th:href="${nginxsite}+${pic.picUrl}"
+                           class="pic_name" target="_blank"></a>
+                        <a th:text="${pic.picName}" th:if="${pic.picHasdown==0}" th:href="${pic.picOriurl}"
+                           class="pic_name" target="_blank"></a>
+                        <!--                        <img th:if="${pic.picHasdown==1}" th:src="${nginxsite}+${pic.picUrl}" class="pic_img"/>-->
+                        <!--                        <img th:if="${pic.picHasdown==0}" th:src="${pic.picOriurl}" class="pic_img"/>-->
                         <span th:if="${pic.picHasdown==1}" style="color: greenyellow">已下载</span>
                         <span th:if="${pic.picHasdown==0}" style="color: orangered">未下载</span>
                     </div>
@@ -302,25 +310,25 @@
 </div>
 </body>
 <script>
-    $(function (){
-        var rate = Math.round([[${picdata.hasdown}]]*100/[[${picdata.allnum}]])
-        $(".main-progress").width(rate  + "%");
-        $(".main-progress").text(rate  + "%");
-        if ([[${picdata.downloadStatus}]] == 1){
-            $(".download_tip_text").text("下载中").css("color","red")
+    $(function () {
+        var rate = Math.round([[${picdata.hasdown}]] * 100 / [[${picdata.allnum}]])
+        $(".main-progress").width(rate + "%");
+        $(".main-progress").text(rate + "%");
+        if ([[${picdata.downloadStatus}]] == 1) {
+            $(".download_tip_text").text("下载中").css("color", "red")
             var timingmainTask = setInterval(function () {
                 $.ajax({
                     type: 'get',
                     url: "./getmainprogress",
                     dataType: 'json',
                     success: function (result) {
-                        var rate = Math.round(result["hasdown"] * 100/result["allnum"])
-                        $(".main-progress").width(rate  + "%");
-                        $(".main-progress").text(rate  + "%");
-                        if (result["hasdown"] == result["allnum"]){
+                        var rate = Math.round(result["hasdown"] * 100 / result["allnum"])
+                        $(".main-progress").width(rate + "%");
+                        $(".main-progress").text(rate + "%");
+                        if (result["hasdown"] == result["allnum"]) {
                             window.clearInterval(timingmainTask)
                             $(".sudoBt").removeAttr("disabled")
-                            $(".download_tip_text").text("下载完成").css("color","green")
+                            $(".download_tip_text").text("下载完成").css("color", "green")
                         }
                     }
                 });
@@ -333,8 +341,8 @@
     })
 
     function sudopic() {
-        $(".sudoBt").attr("disabled","disabled")
-        $(".download_tip_text").text("下载中...").css("color","red")
+        $(".sudoBt").attr("disabled", "disabled")
+        $(".download_tip_text").text("下载中...").css("color", "red")
         $.ajax({
             type: 'get',
             url: "./sudodownloadpic",
@@ -348,48 +356,48 @@
                 url: "./getmainprogress",
                 dataType: 'json',
                 success: function (result) {
-                    var rate = Math.round(result["hasdown"] * 100/result["allnum"])
-                    $(".main-progress").width(rate  + "%");
-                    $(".main-progress").text(rate  + "%");
-                    if (result["hasdown"] == result["allnum"]){
+                    var rate = Math.round(result["hasdown"] * 100 / result["allnum"])
+                    $(".main-progress").width(rate + "%");
+                    $(".main-progress").text(rate + "%");
+                    if (result["hasdown"] == result["allnum"]) {
                         window.clearInterval(timingTask)
-                        $(".sudoBt").removeAttr("disabled","")
-                        $(".download_tip_text").text("下载完成").css("color","green")
+                        $(".sudoBt").removeAttr("disabled", "")
+                        $(".download_tip_text").text("下载完成").css("color", "green")
                     }
                 }
             });
         }, 1000)
     }
 
-    $(".procebut").click(function (){
+    $(".procebut").click(function () {
         var cls = $(this).attr("value")
-        $(".bloguser_pics."+cls).toggleClass("remove")
+        $(".bloguser_pics." + cls).toggleClass("remove")
     })
 
-    $(".deletebut").click(function (){
+    $(".deletebut").click(function () {
         var cls = $(this).attr("value")
-        if(confirm("是否删除此博主下所有图片")){
-            $("#loading").css("display","flex")
-            $("#loading .tip_bt").css("display","none")
+        if (confirm("是否删除此博主下所有图片")) {
+            $("#loading").css("display", "flex")
+            $("#loading .tip_bt").css("display", "none")
             $("#loading .tip_text").text("删除中请稍等......")
             $.ajax({
                 type: 'get',
-                url: "./deletepicForbloguser?containerid=" + cls ,
+                url: "./deletepicForbloguser?containerid=" + cls,
                 success: function (result) {
                     $("#loading .tip_text").text("删除成功!")
-                    $("#loading .tip_bt").css("display","block")
-                    $(".allpic .blogusercell."+cls).remove()
+                    $("#loading .tip_bt").css("display", "block")
+                    $(".allpic .blogusercell." + cls).remove()
                 }
             });
         }
     })
 
-    $(".downloadbut").click(function (){
+    $(".downloadbut").click(function () {
         var cls = $(this).attr("value")
-        if(confirm("是否下载此博主下所有未下载图片")){
+        if (confirm("是否下载此博主下所有未下载图片")) {
             $.ajax({
                 type: 'get',
-                url: "./downloadpicForbloguser?containerid=" + cls ,
+                url: "./downloadpicForbloguser?containerid=" + cls,
                 success: function (result) {
 
                 }
@@ -401,10 +409,10 @@
                 url: "./getBloguserProgress?containerid=" + cls,
                 dataType: 'json',
                 success: function (result) {
-                    var rate = Math.round(result["hasdown"] * 100/result["allnum"])
-                    $(".progress-bar."+cls).width(rate  + "%");
-                    $(".progress-bar."+cls).text(rate  + "%");
-                    if (result["hasdown"] == result["allnum"]){
+                    var rate = Math.round(result["hasdown"] * 100 / result["allnum"])
+                    $(".progress-bar." + cls).width(rate + "%");
+                    $(".progress-bar." + cls).text(rate + "%");
+                    if (result["hasdown"] == result["allnum"]) {
                         window.clearInterval(timingmainTask)
                     }
                 }
@@ -413,15 +421,26 @@
 
     })
 
-    $(".pic_name").hover(function (){
-        if (!$(this).hasClass("haspic")){
+    $(".packagedown").click(function () {
+        var cls = $(this).attr("value")
+        var $eleForm = $("<form method='get'></form>");
+        $eleForm.attr("action","./packagedownpicForbloguser");
+        $eleForm.append("<input type='hidden' name='" + "containerid" + "' value='" + cls + "'/>")
+        $(document.body).append($eleForm);
+        //提交表单，实现下载
+        $eleForm.submit();
+        $eleForm.remove();
+    })
+
+    $(".pic_name").hover(function () {
+        if (!$(this).hasClass("haspic")) {
             $(this).addClass("haspic")
-            $(this).after("<img src='"+$(this).attr("href")+"' class='pic_img'/>")
+            $(this).after("<img src='" + $(this).attr("href") + "' class='pic_img'/>")
         }
     })
 
-    $("#loading .tip_bt").click(function (){
-        $("#loading").css("display","none")
+    $("#loading .tip_bt").click(function () {
+        $("#loading").css("display", "none")
     })
 
 
